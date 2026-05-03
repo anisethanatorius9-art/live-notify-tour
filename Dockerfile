@@ -1,4 +1,4 @@
-FROM php:8.3-cli
+FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
     unzip curl git libzip-dev zip sqlite3 libsqlite3-dev
