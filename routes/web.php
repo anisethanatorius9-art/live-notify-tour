@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified', 'role.check', 'role:provider'])->group(fu
 });
 
 // Admin Routes
-Route::middleware(['auth', 'verified', 'role.check', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'role.check', 'admin.check'])->group(function () {
     Route::get('/dashboard/admin', AdminDashboard::class)->name('dashboard.admin');
 
     // Admin management routes under /admin prefix with admin.* name prefix

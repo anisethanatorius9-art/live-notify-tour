@@ -3,10 +3,19 @@
         <!-- Header Section -->
         <div class="bg-white border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <h1 class="text-3xl font-bold text-gray-900">
-                    {{ __('Admin Dashboard') }}
-                </h1>
-                <p class="text-gray-600 mt-2">{{ __('System overview and management') }}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <h1 class="text-3xl font-bold text-gray-900">
+                            {{ __('Admin Dashboard') }}
+                        </h1>
+                        <p class="text-gray-600 mt-2">{{ __('System overview and management') }}</p>
+                    </div>
+                    <!-- Help & Settings Buttons -->
+                    <div class="flex items-center gap-3">
+                        <livewire:admin.admin-help />
+                        <livewire:admin.admin-settings />
+                    </div>
+                </div>
             </div>
         </div>
 
