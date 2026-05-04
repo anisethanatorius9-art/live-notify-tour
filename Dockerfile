@@ -1,22 +1,35 @@
-FROM php:8.4-cli
+FROM php:8.2-cli
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    unzip curl git libzip-dev zip sqlite3 libsqlite3-dev
+    unzip \
+    git \
+    curl \
+    libzip-dev \
+    zip
 
-RUN docker-php-ext-install pdo pdo_sqlite zip
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql zip
 
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Set working directory
 WORKDIR /app
 
+# Copy project
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+# Install Laravel dependencies
+RUN composer install --optimize-autoloader --no-dev
 
-RUN php artisan key:generate --force || true
-RUN mkdir -p database && touch database/database.sqlite
-RUN chmod -R 755 storage bootstrap/cache || true
+# Laravel setup
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 
+# Expose port
 EXPOSE 10000
 
-CMD ["/bin/sh", "-lc", "mkdir -p database && touch database/database.sqlite && php artisan migrate --force || true && php artisan config:clear || true && php artisan cache:clear || true && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"]
+# Start server
+CMD php artisan serve --host=0.0.0.0 --port=10000
