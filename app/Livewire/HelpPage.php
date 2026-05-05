@@ -8,6 +8,7 @@ class HelpPage extends Component
 {
     public string $search = '';
     public ?string $selectedCategory = null;
+    public array $categories = [];
 
     protected array $helpCategories = [
         ['name' => 'Account Help', 'description' => 'Login, registration, password reset', 'icon' => 'user'],
@@ -40,6 +41,11 @@ class HelpPage extends Component
         ],
     ];
 
+    public function mount(): void
+    {
+        $this->categories = $this->helpCategories;
+    }
+
     public function selectCategory(string $category): void
     {
         $this->selectedCategory = $this->selectedCategory === $category ? null : $category;
@@ -67,6 +73,9 @@ class HelpPage extends Component
 
     public function render()
     {
-        return view('livewire.help-page');
+        return view('livewire.help-page', [
+            'categories' => $this->categories,
+            'filteredFaqs' => $this->filteredFaqs,
+        ]);
     }
 }
