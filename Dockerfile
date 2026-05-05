@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm
 
-# Install PHP extensions (including SQLite)
-RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
