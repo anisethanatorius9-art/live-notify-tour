@@ -22,14 +22,14 @@ WORKDIR /app
 # Copy project
 COPY . .
 
+# Install Laravel dependencies (before npm build so vendor files exist)
+RUN composer install --optimize-autoloader --no-dev
+
 # Install Node dependencies
 RUN npm install --legacy-peer-deps
 
 # Build frontend assets
 RUN npm run build
-
-# Install Laravel dependencies
-RUN composer install --optimize-autoloader --no-dev
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
