@@ -144,8 +144,8 @@
     <flux:sidebar.spacer />
 
     <flux:sidebar.nav class="space-y-1 px-3 pb-4 border-t border-zinc-200 dark:border-zinc-700 pt-4">
-        <flux:sidebar.item icon="cog-6-tooth" href="#" class="rounded-lg">Settings</flux:sidebar.item>
-        <flux:sidebar.item icon="information-circle" href="#" class="rounded-lg">Help</flux:sidebar.item>
+        <flux:sidebar.item icon="cog-6-tooth" href="{{ route('profile.edit') }}" wire:navigate class="rounded-lg">Settings</flux:sidebar.item>
+        <flux:sidebar.item icon="information-circle" href="https://help.example.com" target="_blank" class="rounded-lg">Help</flux:sidebar.item>
     </flux:sidebar.nav>
 
     {{-- User Profile Dropdown --}}
