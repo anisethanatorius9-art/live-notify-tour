@@ -8,6 +8,7 @@ use App\Livewire\Auth\RoleSelection;
 use App\Livewire\Dashboard\TouristDashboard;
 use App\Livewire\Dashboard\ProviderDashboard;
 use App\Livewire\Dashboard\AdminDashboard;
+use App\Livewire\HelpPage;
 use App\Livewire\Admin\UserManagement;
 use App\Livewire\Bookings\CreateBooking;
 use App\Models\User;
@@ -128,6 +129,8 @@ Route::middleware(['auth', 'verified', 'role.check'])->group(function () {
     Route::get('/notifications', function () {
         return view('livewire.notifications.index');
     })->name('notifications.index');
+
+    Route::get('/help', HelpPage::class)->name('help');
 });
 
 Route::middleware(['auth'])->group(function () {
