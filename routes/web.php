@@ -9,13 +9,26 @@ use App\Livewire\Dashboard\TouristDashboard;
 use App\Livewire\Dashboard\ProviderDashboard;
 use App\Livewire\Dashboard\AdminDashboard;
 use App\Livewire\HelpPage;
+use App\Livewire\Admin\CategoryManagement;
+use App\Livewire\Admin\LocationManagement;
 use App\Livewire\Admin\UserManagement;
+use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Auth\AdminRegisterController;
+use App\Livewire\Auth\AdminRegisterVerify;
 use App\Livewire\Bookings\CreateBooking;
 use App\Models\User;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+Route::middleware(['guest'])->group(function () {
+    Route::view('/admin/login', 'livewire.auth.admin-login')->name('admin.login');
+    Route::post('/admin/login', [AdminLoginController::class, 'store'])->name('admin.login.store');
+    Route::get('/admin/register', [AdminRegisterController::class, 'show'])->name('admin.register');
+    Route::post('/admin/register', [AdminRegisterController::class, 'store'])->name('admin.register.store');
+    Route::get('/admin/register/verify', AdminRegisterVerify::class)->name('admin.register.verify');
+});
 
 // Smart Dashboard Route - redirects based on role
 Route::middleware(['auth', 'verified', 'role.check'])->group(function () {
@@ -89,9 +102,12 @@ Route::middleware(['auth', 'verified', 'role.check', 'admin.check'])->group(func
 
         // Locations
         Route::name('locations.')->group(function () {
-            Route::get('/locations', function () {
-                return view('livewire.locations.index');
-            })->name('index');
+            Route::get('/locations', LocationManagement::class)->name('index');
+        });
+
+        // Categories
+        Route::name('categories.')->group(function () {
+            Route::get('/categories', CategoryManagement::class)->name('index');
         });
 
         // Payments

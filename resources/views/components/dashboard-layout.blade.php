@@ -5,7 +5,7 @@
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-white dark:bg-zinc-800 antialiased">
+<body class="min-h-screen bg-white text-zinc-900 dark:bg-zinc-800 dark:text-white antialiased">
     <x-app-sidebar />
 
     <flux:main>

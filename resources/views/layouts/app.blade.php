@@ -15,7 +15,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-white dark:bg-zinc-800 antialiased">
+<body class="min-h-screen bg-white text-zinc-900 dark:bg-zinc-800 dark:text-white antialiased">
     {{-- Sidebar Navigation --}}
     <x-app-sidebar />
 

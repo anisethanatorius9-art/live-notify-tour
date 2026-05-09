@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-gray-50 dark:bg-gray-900 antialiased">
+<body class="min-h-screen bg-gray-50 text-zinc-900 dark:bg-gray-900 dark:text-white antialiased">
     <div class="flex min-h-screen items-center justify-center p-6">
         <div class="w-full max-w-2xl space-y-6">
             <div class="text-center">

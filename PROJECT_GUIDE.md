@@ -284,6 +284,50 @@ resources/views/
 ✅ Password hashing
 ✅ XSS Protection via Blade templating
 
+## 🔐 Session & Authentication Management (Updated)
+
+### Session Configuration
+- **Driver**: Database-backed sessions (stored in `sessions` table)
+- **Lifetime**: 24 hours (configurable via `SESSION_LIFETIME` env variable)
+- **Auto Cleanup**: Expired sessions are automatically removed
+
+### Logout Process
+The application has been enhanced with robust session management:
+
+1. **Remember Token Clearing**: 
+   - All remember tokens are cleared during logout to prevent unauthorized re-login attempts
+   - Prevents credential reuse after logout
+
+2. **Complete Session Invalidation**:
+   - All database sessions for the user are deleted
+   - Session cookie is invalidated
+   - CSRF tokens are regenerated
+   - Full redirect to home page
+
+3. **SessionService Class** (`app/Services/SessionService.php`):
+   - `completeLogout()` - Complete logout with all cleanup
+   - `invalidateAllUserSessions($userId)` - Force logout all sessions (useful for admin actions)
+   - `cleanupExpiredSessions()` - Remove expired sessions from database
+
+### Running Session Cleanup
+Cleanup expired sessions with:
+```bash
+php artisan sessions:cleanup
+```
+
+Add to Laravel scheduler (in `app/Console/Kernel.php`) for automatic cleanup:
+```php
+$schedule->command('sessions:cleanup')->hourly();
+```
+
+### Environment Variables for Session
+```
+SESSION_DRIVER=database          # Use database for session storage
+SESSION_LIFETIME=1440            # Session lifetime in minutes (24 hours)
+SESSION_EXPIRE_ON_CLOSE=false    # Keep sessions after browser closes
+SESSION_ENCRYPT=false            # Session encryption (optional)
+```
+
 ## 🎯 Next Steps
 
 1. **Complete Livewire Components**:

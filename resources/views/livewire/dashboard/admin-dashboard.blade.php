@@ -87,80 +87,75 @@
                                 wire:model.live="search"
                                 type="search"
                                 :placeholder="__('Search users...')"
-                                icon="magnifying-glass"
-                            />
+                                icon="magnifying-glass" />
                             <flux:select
                                 wire:model.live="filterRole"
-                                :options="['' => 'All Roles', 'tourist' => 'Tourists', 'provider' => 'Providers', 'admin' => 'Admins']"
-                            />
+                                :options="['' => 'All Roles', 'tourist' => 'Tourists', 'provider' => 'Providers', 'admin' => 'Admins']" />
                         </div>
 
                         <!-- Users Table -->
                         @if($users->count())
-                            <div class="overflow-x-auto">
-                                <table class="w-full">
-                                    <thead class="border-b border-gray-200">
-                                        <tr>
-                                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Name') }}</th>
-                                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Email') }}</th>
-                                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Role') }}</th>
-                                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Joined') }}</th>
-                                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Actions') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($users as $user)
-                                            <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                                <td class="py-3 px-2 text-sm font-medium text-gray-900">{{ $user->name }}</td>
-                                                <td class="py-3 px-2 text-sm text-gray-600">{{ $user->email }}</td>
-                                                <td class="py-3 px-2 text-sm">
-                                                    <flux:badge
-                                                        :color="match($user->role) {
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="border-b border-gray-200">
+                                    <tr>
+                                        <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Name') }}</th>
+                                        <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Email') }}</th>
+                                        <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Role') }}</th>
+                                        <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Joined') }}</th>
+                                        <th class="text-left py-3 px-2 text-sm font-semibold text-gray-900">{{ __('Actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($users as $user)
+                                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                        <td class="py-3 px-2 text-sm font-medium text-gray-900">{{ $user->name }}</td>
+                                        <td class="py-3 px-2 text-sm text-gray-600">{{ $user->email }}</td>
+                                        <td class="py-3 px-2 text-sm">
+                                            <flux:badge
+                                                :color="match($user->role) {
                                                             'tourist' => 'blue',
                                                             'provider' => 'green',
                                                             'admin' => 'red',
                                                             default => 'gray'
                                                         }"
-                                                        size="sm"
-                                                    >
-                                                        {{ ucfirst($user->role) }}
-                                                    </flux:badge>
-                                                </td>
-                                                <td class="py-3 px-2 text-sm text-gray-600">
-                                                    {{ $user->created_at->format('M d, Y') }}
-                                                </td>
-                                                <td class="py-3 px-2 text-sm">
-                                                    <div class="flex items-center gap-2">
-                                                        <flux:button
-                                                            href="{{ route('admin.users.edit', $user) }}"
-                                                            size="sm"
-                                                            variant="ghost"
-                                                            icon="pencil"
-                                                            wire:navigate
-                                                        />
-                                                        <flux:button
-                                                            wire:click="deleteUser({{ $user->id }})"
-                                                            size="sm"
-                                                            variant="ghost"
-                                                            icon="trash"
-                                                            class="text-red-600 hover:text-red-700"
-                                                        />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                                                size="sm">
+                                                {{ ucfirst($user->role) }}
+                                            </flux:badge>
+                                        </td>
+                                        <td class="py-3 px-2 text-sm text-gray-600">
+                                            {{ $user->created_at->format('M d, Y') }}
+                                        </td>
+                                        <td class="py-3 px-2 text-sm">
+                                            <div class="flex items-center gap-2">
+                                                <flux:button
+                                                    href="{{ route('admin.users.edit', $user) }}"
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    icon="pencil"
+                                                    wire:navigate />
+                                                <flux:button
+                                                    wire:click="deleteUser({{ $user->id }})"
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    icon="trash"
+                                                    class="text-red-600 hover:text-red-700" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
 
-                            <!-- Pagination -->
-                            <div class="mt-6">
-                                {{ $users->links() }}
-                            </div>
+                        <!-- Pagination -->
+                        <div class="mt-6">
+                            {{ $users->links() }}
+                        </div>
                         @else
-                            <div class="text-center py-12 text-gray-500">
-                                <p>{{ __('No users found') }}</p>
-                            </div>
+                        <div class="text-center py-12 text-gray-500">
+                            <p>{{ __('No users found') }}</p>
+                        </div>
                         @endif
                     </flux:card>
 
@@ -171,15 +166,15 @@
                             <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('Recent Services') }}</h3>
                             <div class="space-y-3 max-h-96 overflow-y-auto">
                                 @forelse($recentServices as $service)
-                                    <div class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
-                                        <p class="font-medium text-gray-900 text-sm">{{ $service->name }}</p>
-                                        <p class="text-xs text-gray-600">{{ $service->provider->name }}</p>
-                                        <p class="text-xs text-gray-500 mt-1">
-                                            {{ $service->created_at->diffForHumans() }}
-                                        </p>
-                                    </div>
+                                <div class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
+                                    <p class="font-medium text-gray-900 text-sm">{{ $service->name }}</p>
+                                    <p class="text-xs text-gray-600">{{ $service->provider->name }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        {{ $service->created_at->diffForHumans() }}
+                                    </p>
+                                </div>
                                 @empty
-                                    <p class="text-gray-500 text-sm">{{ __('No services') }}</p>
+                                <p class="text-gray-500 text-sm">{{ __('No services') }}</p>
                                 @endforelse
                             </div>
                         </flux:card>
@@ -189,28 +184,27 @@
                             <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('Recent Payments') }}</h3>
                             <div class="space-y-3 max-h-96 overflow-y-auto">
                                 @forelse($recentPayments as $payment)
-                                    <div class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
-                                        <div class="flex justify-between items-start">
-                                            <div>
-                                                <p class="font-medium text-gray-900 text-sm">{{ $payment->user->name }}</p>
-                                                <p class="text-xs text-gray-600">{{ $payment->booking->service->name }}</p>
-                                            </div>
-                                            <span class="text-sm font-bold text-green-600">
-                                                +{{ number_format($payment->amount, 2) }}
-                                            </span>
+                                <div class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium text-gray-900 text-sm">{{ $payment->user->name }}</p>
+                                            <p class="text-xs text-gray-600">{{ $payment->booking->service->name }}</p>
                                         </div>
-                                        <div class="flex justify-between items-center mt-2">
-                                            <p class="text-xs text-gray-500">{{ $payment->created_at->diffForHumans() }}</p>
-                                            <flux:badge
-                                                :color="$payment->status === 'completed' ? 'green' : 'yellow'"
-                                                size="xs"
-                                            >
-                                                {{ ucfirst($payment->status) }}
-                                            </flux:badge>
-                                        </div>
+                                        <span class="text-sm font-bold text-green-600">
+                                            +{{ number_format($payment->amount, 2) }}
+                                        </span>
                                     </div>
+                                    <div class="flex justify-between items-center mt-2">
+                                        <p class="text-xs text-gray-500">{{ $payment->created_at->diffForHumans() }}</p>
+                                        <flux:badge
+                                            :color="$payment->status === 'completed' ? 'green' : 'yellow'"
+                                            size="xs">
+                                            {{ ucfirst($payment->status) }}
+                                        </flux:badge>
+                                    </div>
+                                </div>
                                 @empty
-                                    <p class="text-gray-500 text-sm">{{ __('No payments') }}</p>
+                                <p class="text-gray-500 text-sm">{{ __('No payments') }}</p>
                                 @endforelse
                             </div>
                         </flux:card>
@@ -244,6 +238,9 @@
                         <div class="space-y-2">
                             <flux:link :href="route('admin.locations.index')" wire:navigate class="block text-blue-600 hover:underline">
                                 {{ __('Manage Locations') }}
+                            </flux:link>
+                            <flux:link :href="route('admin.categories.index')" wire:navigate class="block text-blue-600 hover:underline">
+                                {{ __('Manage Categories') }}
                             </flux:link>
                             <flux:link :href="route('admin.services.index')" wire:navigate class="block text-blue-600 hover:underline">
                                 {{ __('View All Services') }}

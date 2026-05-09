@@ -5,7 +5,7 @@
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-white dark:bg-zinc-800">
+<body class="min-h-screen bg-white text-zinc-900 dark:bg-zinc-800 dark:text-white">
     <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
@@ -24,13 +24,13 @@
                 <flux:navlist.item icon="magnifying-glass" href="#" :current="request()->routeIs('services.*')" wire:navigate>
                     {{ __('Services') }}
                 </flux:navlist.item>
-                 <flux:navlist.item icon="calendar" :href="route('bookings.index')" :current="request()->routeIs('bookings.*')" wire:navigate>
-                     {{ __('My Bookings') }}
-                 </flux:navlist.item>
-                 <flux:navlist.item icon="bell" :href="route('notifications.index')" :current="request()->routeIs('notifications.*')" wire:navigate>
-                     {{ __('Notifications') }}
-                 </flux:navlist.item>
-             </flux:navlist.group>
+                <flux:navlist.item icon="calendar" :href="route('bookings.index')" :current="request()->routeIs('bookings.*')" wire:navigate>
+                    {{ __('My Bookings') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="bell" :href="route('notifications.index')" :current="request()->routeIs('notifications.*')" wire:navigate>
+                    {{ __('Notifications') }}
+                </flux:navlist.item>
+            </flux:navlist.group>
             @elseif(auth()->user()->role === 'provider')
             <flux:navlist.group :heading="__('Business')" class="grid">
                 <flux:navlist.item icon="cube" :href="route('services.index')" :current="request()->routeIs('services.*')" wire:navigate>
@@ -57,16 +57,16 @@
                 <flux:navlist.item icon="cube" :href="route('admin.services.index')" :current="request()->routeIs('admin.services.*')" wire:navigate>
                     {{ __('Services') }}
                 </flux:navlist.item>
-                 <flux:navlist.item icon="calendar" :href="route('admin.bookings.index')" :current="request()->routeIs('admin.bookings.*')" wire:navigate>
-                     {{ __('Bookings') }}
-                 </flux:navlist.item>
-                  <flux:navlist.item icon="credit-card" :href="route('admin.payments.index')" :current="request()->routeIs('admin.payments.*')" wire:navigate>
-                      {{ __('Payments') }}
-                  </flux:navlist.item>
+                <flux:navlist.item icon="calendar" :href="route('admin.bookings.index')" :current="request()->routeIs('admin.bookings.*')" wire:navigate>
+                    {{ __('Bookings') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="credit-card" :href="route('admin.payments.index')" :current="request()->routeIs('admin.payments.*')" wire:navigate>
+                    {{ __('Payments') }}
+                </flux:navlist.item>
                 <flux:navlist.item icon="bell" :href="route('notifications.index')" :current="request()->routeIs('notifications.*')" wire:navigate>
                     {{ __('Notifications') }}
                 </flux:navlist.item>
-                 <flux:navlist.item icon="cog-6-tooth" :href="route('admin.settings.index')" :current="request()->routeIs('admin.settings.*')" wire:navigate>
+                <flux:navlist.item icon="cog-6-tooth" :href="route('admin.settings.index')" :current="request()->routeIs('admin.settings.*')" wire:navigate>
                     {{ __('Settings') }}
                 </flux:navlist.item>
             </flux:navlist.group>
