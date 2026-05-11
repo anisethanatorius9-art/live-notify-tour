@@ -30,8 +30,8 @@
             </flux:sidebar.item>
         </div>
 
-        {{-- Tourist Routes --}}
-        @if($user->role === 'tourist')
+        {{-- Tourist Routes - Added nullsafe check ?-> --}}
+        @if($user?->role === 'tourist')
         <div class="mb-6">
             <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Tourism</p>
             <flux:sidebar.item
@@ -50,27 +50,27 @@
                 Locations
             </flux:sidebar.item>
 
-             <flux:sidebar.item
-                 icon="tag"
-                 href="{{ route('categories.index') }}"
-                 :current="request()->routeIs('categories.*')"
-                 class="rounded-lg">
-                 Categories
-             </flux:sidebar.item>
+            <flux:sidebar.item
+                icon="tag"
+                href="{{ route('categories.index') }}"
+                :current="request()->routeIs('categories.*')"
+                class="rounded-lg">
+                Categories
+            </flux:sidebar.item>
 
-             <flux:sidebar.item
-                 icon="bell"
-                 badge="{{ $user->notifications->count() }}"
-                 href="{{ route('notifications.index') }}"
-                 :current="request()->routeIs('notifications.*')"
-                 class="rounded-lg">
-                 Notifications
-             </flux:sidebar.item>
+            <flux:sidebar.item
+                icon="bell"
+                badge="{{ $user->notifications->count() }}"
+                href="{{ route('notifications.index') }}"
+                :current="request()->routeIs('notifications.*')"
+                class="rounded-lg">
+                Notifications
+            </flux:sidebar.item>
         </div>
         @endif
 
-        {{-- Service Provider Routes --}}
-        @if($user->role === 'provider')
+        {{-- Service Provider Routes - Added nullsafe check ?-> --}}
+        @if($user?->role === 'provider')
         <div class="mb-6">
             <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Services</p>
             <flux:sidebar.item
@@ -89,19 +89,19 @@
                 Service Bookings
             </flux:sidebar.item>
 
-             <flux:sidebar.item
-                 icon="bell"
-                 badge="{{ $user->notifications->count() }}"
-                 href="{{ route('notifications.index') }}"
-                 :current="request()->routeIs('notifications.*')"
-                 class="rounded-lg">
-                 Notifications
-             </flux:sidebar.item>
+            <flux:sidebar.item
+                icon="bell"
+                badge="{{ $user->notifications->count() }}"
+                href="{{ route('notifications.index') }}"
+                :current="request()->routeIs('notifications.*')"
+                class="rounded-lg">
+                Notifications
+            </flux:sidebar.item>
         </div>
         @endif
 
-        {{-- Admin Routes --}}
-        @if($user->role === 'admin')
+        {{-- Admin Routes - Added nullsafe check ?-> --}}
+        @if($user?->role === 'admin')
         <div class="mb-6">
             <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Management</p>
             <flux:sidebar.group expandable heading="Admin" class="rounded-lg space-y-1">
@@ -148,15 +148,16 @@
         <flux:sidebar.item icon="information-circle" href="{{ route('help') }}" wire:navigate class="rounded-lg">Help</flux:sidebar.item>
     </flux:sidebar.nav>
 
-    {{-- User Profile Dropdown --}}
+    {{-- User Profile Dropdown - Only show if user is logged in --}}
+    @auth
     <flux:dropdown position="top" align="start" class="max-lg:hidden px-3 pb-3">
         <flux:sidebar.profile
             :avatar="$user->profile_photo ?? 'https://fluxui.dev/img/demo/user.png'"
             :name="$user->name" />
 
         <flux:menu>
-            <flux:menu.item icon="user">Profile</flux:menu.item>
-            <flux:menu.item icon="cog-6-tooth">Settings</flux:menu.item>
+            <flux:menu.item icon="user" href="{{ route('profile.edit') }}">Profile</flux:menu.item>
+            <flux:menu.item icon="cog-6-tooth" href="{{ route('profile.edit') }}">Settings</flux:menu.item>
             <flux:menu.separator />
 
             <form method="POST" action="{{ route('logout') }}">
@@ -167,4 +168,11 @@
             </form>
         </flux:menu>
     </flux:dropdown>
+    @else
+    <div class="px-3 pb-3">
+        <flux:sidebar.item icon="arrow-right-end-on-rectangle" href="{{ route('login') }}" class="rounded-lg">
+            Login
+        </flux:sidebar.item>
+    </div>
+    @endauth
 </flux:sidebar>

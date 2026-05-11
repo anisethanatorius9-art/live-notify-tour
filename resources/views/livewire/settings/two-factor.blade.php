@@ -177,6 +177,7 @@ new class extends Component {
     }
 } ?>
 
+<x-layouts.app>
 <section class="w-full">
     @include('partials.settings-heading')
 
@@ -379,6 +380,7 @@ new class extends Component {
                     </div>
                 </div>
             @endif
-        </div>
-    </flux:modal>
-</section>
+            </div>
+        </flux:modal>
+    </section>
+</x-layouts.app>

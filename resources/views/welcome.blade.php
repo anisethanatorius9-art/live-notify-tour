@@ -181,7 +181,7 @@
                     Your ultimate safari guide starts here.
                 </p>
 
-                <!-- Buttons zilizopangwa vizuri -->
+
                 <div class="reveal active" style="transition-delay: 0.6s">
                     <a href="{{ route('register') }}" class="btn-modern btn-primary-glow">
                         Get Started

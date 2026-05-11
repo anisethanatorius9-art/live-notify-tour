@@ -14,6 +14,8 @@ use App\Livewire\Admin\LocationManagement;
 use App\Livewire\Admin\UserManagement;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Auth\AdminRegisterController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Livewire\Auth\AdminPhoneLogin;
 use App\Livewire\Auth\AdminRegisterVerify;
 use App\Livewire\Bookings\CreateBooking;
 use App\Models\User;
@@ -28,6 +30,14 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/admin/register', [AdminRegisterController::class, 'show'])->name('admin.register');
     Route::post('/admin/register', [AdminRegisterController::class, 'store'])->name('admin.register.store');
     Route::get('/admin/register/verify', AdminRegisterVerify::class)->name('admin.register.verify');
+
+    // Phone-based admin OTP login
+    Route::get('/admin/login/phone', AdminPhoneLogin::class)->name('admin.login.phone');
+
+    // User login routes
+    Route::get('/login/google', [SocialAuthController::class, 'redirectToGoogle'])->name('login.google');
+    Route::get('/login/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('login.google.callback');
+    Route::get('/login/phone', \App\Livewire\Auth\UserPhoneLogin::class)->name('login.phone');
 });
 
 // Smart Dashboard Route - redirects based on role

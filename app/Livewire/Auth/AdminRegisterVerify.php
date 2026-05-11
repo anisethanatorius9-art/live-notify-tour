@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use App\Models\AdminAccessKey;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -58,11 +59,13 @@ class AdminRegisterVerify extends Component
 
         if (! $otp || $otp !== $this->code) {
             $this->addError('code', 'The verification code is invalid.');
+
             return;
         }
 
         if ($expiresAt && now()->timestamp > $expiresAt) {
             $this->addError('code', 'The verification code has expired. Please resend the code.');
+
             return;
         }
 
@@ -73,6 +76,10 @@ class AdminRegisterVerify extends Component
         }
 
         $user = User::create($registration);
+
+        // Generate a secure admin access key for this user
+        $this->generateAdminAccessKey($user);
+
         Auth::login($user);
 
         session()->forget([
@@ -82,16 +89,49 @@ class AdminRegisterVerify extends Component
         ]);
 
         session()->regenerate();
+        session()->flash('access_key_generated', true);
+        session()->put('generated_access_key', $this->getActiveAccessKey($user)->access_key);
 
         return redirect()->route('dashboard.admin');
+    }
+
+    /**
+     * Generate a secure admin access key for the given user.
+     */
+    protected function generateAdminAccessKey(User $user): AdminAccessKey
+    {
+        // Revoke any existing keys for security
+        AdminAccessKey::where('user_id', $user->id)->update(['is_active' => false]);
+
+        // Generate a new cryptographically secure access key
+        return AdminAccessKey::create([
+            'user_id' => $user->id,
+            'access_key' => hash('sha256', random_bytes(32)),
+            'is_active' => true,
+            'expires_at' => now()->addMonths(6),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
+     * Get the active access key for the user.
+     */
+    protected function getActiveAccessKey(User $user): ?AdminAccessKey
+    {
+        return AdminAccessKey::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->where('expires_at', '>', now())
+            ->first();
     }
 
     protected function formatPhone(?string $phone, ?string $country): string
     {
         $callingCode = $this->callingCodes[$country] ?? '';
-        if ($callingCode && $phone && !str_starts_with($phone, $callingCode)) {
-            return $callingCode . ' ' . $phone;
+        if ($callingCode && $phone && ! str_starts_with($phone, $callingCode)) {
+            return $callingCode . ltrim($phone, '+');
         }
+
         return $phone ?? '';
     }
 

@@ -14,6 +14,7 @@
             </div>
         </div>
 
+        <!-- Email/Password Login -->
         <form method="POST" action="{{ route('admin.login.store') }}" class="flex flex-col gap-6">
             @csrf
 
@@ -68,6 +69,21 @@
                 </flux:button>
             </div>
         </form>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-3">
+            <div class="flex-1 border-t border-zinc-200 dark:border-zinc-700"></div>
+            <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('or') }}</span>
+            <div class="flex-1 border-t border-zinc-200 dark:border-zinc-700"></div>
+        </div>
+
+        <!-- Phone Login Option -->
+        <flux:link :href="route('admin.login.phone')" wire:navigate class="w-full">
+            <flux:button variant="outline" type="button" class="w-full">
+                <flux:icon.phone class="mr-2 h-5 w-5" />
+                {{ __('Login with Phone & OTP') }}
+            </flux:button>
+        </flux:link>
 
         <!-- Admin Registration -->
         <div class="space-y-2 text-center text-sm text-zinc-600 dark:text-zinc-400">

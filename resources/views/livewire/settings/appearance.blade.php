@@ -6,6 +6,7 @@ new class extends Component {
     //
 }; ?>
 
+<x-layouts.app>
 <section class="w-full">
     @include('partials.settings-heading')
 
@@ -17,3 +18,4 @@ new class extends Component {
         </flux:radio.group>
     </x-settings.layout>
 </section>
+</x-layouts.app>

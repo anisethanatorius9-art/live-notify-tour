@@ -49,6 +49,7 @@ class User extends Authenticatable
         'bio',
         'profile_photo',
         'role_selected_at',
+        'google_id',
     ];
 
     /**
