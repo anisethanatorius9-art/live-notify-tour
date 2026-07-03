@@ -19,7 +19,11 @@ use App\Livewire\Auth\AdminPhoneLogin;
 use App\Livewire\Auth\AdminRegisterVerify;
 use App\Livewire\Bookings\CreateBooking;
 use App\Livewire\Bookings\BookingIndex;
+use App\Livewire\Admin\AdminBookingIndex;
+use App\Models\Booking;
 use App\Models\User;
+use App\Models\Location;
+use App\Models\Service;
 
 Route::get('/', function () {
     return view('welcome');
@@ -81,16 +85,19 @@ Route::middleware(['auth', 'verified', 'role.check', 'role:tourist'])->group(fun
             $data = $parks[$park];
 
             // Find a provider user (seeded) or first provider
-            $provider = \App\Models\User::where('role', 'provider')->first();
-            if (! $provider) {
+            /** @var User|null $provider */
+            $provider = User::where('role', 'provider')->first();
+            if (!$provider) {
                 abort(500, 'No provider user available for park bookings');
             }
+            assert($provider instanceof User);
 
             // Ensure location exists
-            $location = \App\Models\Location::firstOrCreate(['name' => $data['location']]);
+            /** @var Location $location */
+            $location = Location::firstOrCreate(['name' => $data['location']]);
 
             // Create or update a Service representing this park
-            $service = \App\Models\Service::firstOrCreate(
+            $service = Service::firstOrCreate(
                 ['name' => $data['name']],
                 [
                     'provider_id' => $provider->id,
@@ -106,11 +113,6 @@ Route::middleware(['auth', 'verified', 'role.check', 'role:tourist'])->group(fun
 
             return redirect()->route('bookings.create', $service);
         })->name('create.park');
-        Route::get('/bookings/{booking}', function (\App\Models\Booking $booking) {
-            abort_if($booking->tourist_id !== auth()->id(), 403);
-            $booking->load('service.location', 'service.provider');
-            return view('livewire.bookings.show', compact('booking'));
-        })->name('show');
     });
     Route::get('/locations', function () {
         return view('livewire.locations.tourist-index');
@@ -170,9 +172,11 @@ Route::middleware(['auth', 'verified', 'role.check', 'admin.check'])->group(func
 
         // Bookings
         Route::name('bookings.')->group(function () {
-            Route::get('/bookings', function () {
-                return view('livewire.bookings.index');
-            })->name('index');
+            Route::get('/bookings', AdminBookingIndex::class)->name('index');
+            Route::get('/bookings/{booking}', function (Booking $booking) {
+                $booking->load('service.location', 'service.provider');
+                return view('livewire.bookings.show', compact('booking'));
+            })->name('show');
         });
 
         // Settings
@@ -191,6 +195,14 @@ Route::middleware(['auth', 'verified', 'role.check'])->group(function () {
     })->name('notifications.index');
 
     Route::get('/help', HelpPage::class)->name('help');
+
+    // Booking details - accessible to owner (tourist) or admin
+    Route::get('/bookings/{booking}', function (Booking $booking) {
+        $user = auth()->user();
+        abort_if(!$user || ($booking->tourist_id !== $user->id && $user->role !== 'admin'), 403);
+        $booking->load('service.location', 'service.provider');
+        return view('livewire.bookings.show', compact('booking'));
+    })->name('bookings.show');
 });
 
 Route::middleware(['auth'])->group(function () {

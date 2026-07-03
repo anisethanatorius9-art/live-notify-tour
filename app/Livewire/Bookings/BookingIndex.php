@@ -3,12 +3,13 @@
 namespace App\Livewire\Bookings;
 
 use App\Models\Booking;
+use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
 class BookingIndex extends Component
 {
-    public function deleteBooking($bookingId)
+    public function deleteBooking(int $bookingId): void
     {
         $booking = Booking::findOrFail($bookingId);
 
@@ -28,7 +29,9 @@ class BookingIndex extends Component
 
     public function render()
     {
-        $bookings = Auth::user()->bookings()->with('service.location', 'service.provider')->latest()->get();
+        /** @var User $user */
+        $user = Auth::user();
+        $bookings = $user->bookings()->with('service.location', 'service.provider')->latest()->get();
         return view('livewire.bookings.index', compact('bookings'));
     }
 }

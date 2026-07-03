@@ -64,48 +64,47 @@
             {{ $locations->links() }}
         </div>
 
-        <!-- Modal -->
-        @if($showModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-lg max-w-md w-full mx-4 p-6 space-y-4">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-                    {{ $editingId ? 'Edit Location' : 'New Location' }}
-                </h2>
+        <!-- Modal (Flux) -->
+        <flux:modal wire:model="showModal" name="location-modal" class="max-w-md">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+                {{ $editingId ? 'Edit Location' : 'New Location' }}
+            </h2>
 
-                <flux:input
-                    wire:model="name"
-                    label="Location Name"
-                    placeholder="Enter location name"
-                    :error="$errors->first('name')" />
+            <flux:input
+                wire:model="name"
+                label="Location Name"
+                placeholder="Enter location name"
+                :error="$errors->first('name')" />
 
-                <flux:textarea
-                    wire:model="description"
-                    label="Description"
-                    placeholder="Location description"
-                    :error="$errors->first('description')" />
+            <flux:textarea
+                wire:model="description"
+                label="Description"
+                placeholder="Location description"
+                :error="$errors->first('description')" />
 
-                <flux:input
-                    wire:model="latitude"
-                    label="Latitude"
-                    placeholder="-6.7924"
-                    type="number"
-                    step="0.0001"
-                    :error="$errors->first('latitude')" />
+            <flux:input
+                wire:model="latitude"
+                label="Latitude"
+                placeholder="-6.7924"
+                type="number"
+                step="0.0001"
+                :error="$errors->first('latitude')" />
 
-                <flux:input
-                    wire:model="longitude"
-                    label="Longitude"
-                    placeholder="39.2083"
-                    type="number"
-                    step="0.0001"
-                    :error="$errors->first('longitude')" />
+            <flux:input
+                wire:model="longitude"
+                label="Longitude"
+                placeholder="39.2083"
+                type="number"
+                step="0.0001"
+                :error="$errors->first('longitude')" />
 
-                <div class="flex gap-2 pt-4">
-                    <flux:button wire:click="closeModal" variant="ghost" class="flex-1">Cancel</flux:button>
-                    <flux:button wire:click="save" variant="primary" class="flex-1">Save</flux:button>
-                </div>
+            <div class="flex gap-2 pt-4">
+                <flux:modal.close>
+                    <flux:button variant="ghost" class="flex-1">Cancel</flux:button>
+                </flux:modal.close>
+
+                <flux:button wire:click="save" variant="primary" class="flex-1">Save</flux:button>
             </div>
-        </div>
-        @endif
+        </flux:modal>
     </div>
 </x-layouts.app>

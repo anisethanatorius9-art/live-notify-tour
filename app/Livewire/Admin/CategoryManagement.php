@@ -11,7 +11,7 @@ class CategoryManagement extends Component
     use WithPagination;
 
     public $showModal = false;
-    public $editingId = null;
+    public int|null $editingId = null;
     public $name = '';
     public $description = '';
     public $search = '';
@@ -38,7 +38,7 @@ class CategoryManagement extends Component
         $this->showModal = true;
     }
 
-    public function edit($id)
+    public function edit(int $id)
     {
         $category = Category::findOrFail($id);
         $this->editingId = $id;
@@ -70,7 +70,7 @@ class CategoryManagement extends Component
         $this->resetPage();
     }
 
-    public function delete($id)
+    public function delete(int $id)
     {
         Category::findOrFail($id)->delete();
         $this->dispatch('notify', message: 'Category deleted successfully!');

@@ -12,11 +12,11 @@ class PaymentManagement extends Component
     use WithPagination;
 
     public string $search = '';
-    public string $filterStatus = 'pending';
+    public string $filterStatus = '';
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'filterStatus' => ['except' => 'pending'],
+        'filterStatus' => ['except' => ''],
     ];
 
     public function updatingSearch(): void
@@ -60,6 +60,33 @@ class PaymentManagement extends Component
         }
 
         $this->dispatch('notify', message: 'Payment approved and booking confirmed.', type: 'success');
+        $this->resetPage();
+    }
+
+    public function rejectPayment(int $paymentId): void
+    {
+        $payment = Payment::with(['booking.service', 'booking.tourist'])->findOrFail($paymentId);
+
+        if ($payment->status !== 'pending') {
+            $this->dispatch('notify', message: 'Only pending payments can be rejected.', type: 'error');
+            return;
+        }
+
+        $payment->update([
+            'status' => 'failed',
+        ]);
+
+        if ($payment->booking && $payment->booking->tourist) {
+            Notification::create([
+                'user_id' => $payment->booking->tourist->id,
+                'title' => 'Booking rejected',
+                'message' => "Your booking for {$payment->booking->service->name} could not be confirmed. Please contact support.",
+                'type' => 'booking',
+                'is_read' => false,
+            ]);
+        }
+
+        $this->dispatch('notify', message: 'Payment rejected.', type: 'success');
         $this->resetPage();
     }
 

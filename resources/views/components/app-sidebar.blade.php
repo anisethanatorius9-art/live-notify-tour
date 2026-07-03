@@ -1,5 +1,9 @@
 @props(['user' => auth()->user()])
 
+@php
+    $user = $user ?? auth()->user();
+@endphp
+
 <flux:sidebar sticky collapsible="mobile" class="bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700">
     <flux:sidebar.header class="px-4 py-6 border-b border-zinc-200 dark:border-zinc-700">
         <div class="flex items-center gap-3">
@@ -35,6 +39,7 @@
         </div>
     </form>
 
+    @if($user)
     <flux:sidebar.nav class="space-y-2 px-3">
         {{-- Dashboard Section --}}
         <div class="mt-2 mb-6">
@@ -78,7 +83,7 @@
 
             <flux:sidebar.item
                 icon="bell"
-                badge="{{ $user->notifications->count() }}"
+                badge="{{ $user?->notifications()?->count() ?? 0 }}"
                 href="{{ route('notifications.index') }}"
                 :current="request()->routeIs('notifications.*')"
                 class="rounded-lg">
@@ -109,7 +114,7 @@
 
             <flux:sidebar.item
                 icon="bell"
-                badge="{{ $user->notifications->count() }}"
+                badge="{{ $user?->notifications()?->count() ?? 0 }}"
                 href="{{ route('notifications.index') }}"
                 :current="request()->routeIs('notifications.*')"
                 class="rounded-lg">
@@ -158,6 +163,22 @@
         </div>
         @endif
     </flux:sidebar.nav>
+    @else
+    <flux:sidebar.nav class="space-y-2 px-3">
+        <div class="mt-2 mb-6">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Explore</p>
+            <flux:sidebar.item
+                icon="home"
+                href="{{ route('home') }}"
+                :current="request()->routeIs('home')"
+                class="rounded-lg">
+                Home
+            </flux:sidebar.item>
+
+            <flux:sidebar.item icon="arrow-right-end-on-rectangle" href="{{ route('login') }}" class="rounded-lg">Login</flux:sidebar.item>
+        </div>
+    </flux:sidebar.nav>
+    @endif
 
     <flux:sidebar.spacer />
 

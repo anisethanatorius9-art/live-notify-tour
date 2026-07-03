@@ -38,6 +38,12 @@ class AdminDashboard extends Component
         $this->dispatch('notify', message: 'User deleted');
     }
 
+    public function create()
+    {
+        // This prevents Livewire from failing when a create event is routed to this component.
+        $this->dispatch('notify', message: 'Unable to perform create action here.', type: 'warning');
+    }
+
     public function render()
     {
         // System Statistics

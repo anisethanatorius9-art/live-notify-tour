@@ -5,6 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $tourist_id
+ * @property int $service_id
+ * @property string $status
+ * @property \Illuminate\Support\Carbon|null $booking_date
+ * @property string|null $booking_time
+ * @property int $number_of_people
+ * @property float $total_price
+ * @property string|null $notes
+ */
 class Booking extends Model
 {
     use HasFactory;
