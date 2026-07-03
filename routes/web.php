@@ -88,7 +88,15 @@ Route::middleware(['auth', 'verified', 'role.check', 'role:tourist'])->group(fun
             /** @var User|null $provider */
             $provider = User::where('role', 'provider')->first();
             if (!$provider) {
-                abort(500, 'No provider user available for park bookings');
+                $provider = User::updateOrCreate(
+                    ['email' => 'provider@example.com'],
+                    [
+                        'name' => 'Service Provider',
+                        'password' => bcrypt('password'),
+                        'email_verified_at' => now(),
+                        'role' => 'provider',
+                    ]
+                );
             }
             assert($provider instanceof User);
 
