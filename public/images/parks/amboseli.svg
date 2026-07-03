@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="100%" height="100%" fill="#eef2ff"/>
+  <g fill="#ffd166">
+    <rect x="0" y="560" width="1200" height="240"/>
+    <circle cx="900" cy="300" r="70"/>
+  </g>
+  <g fill="#6b705c">
+    <path d="M120 560 L360 420 L600 560 Z"/>
+    <path d="M540 560 L780 380 L1020 560 Z"/>
+  </g>
+  <text x="50%" y="94%" font-family="sans-serif" font-size="44" fill="#283618" text-anchor="middle">Amboseli</text>
+</svg>

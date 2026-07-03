@@ -157,11 +157,13 @@
                         </div>
 
                         <!-- Filter -->
-                        <flux:select
-                            wire:model.live="filterStatus"
-                            :options="['' => 'All Statuses', 'pending' => 'Pending', 'confirmed' => 'Confirmed', 'completed' => 'Completed', 'cancelled' => 'Cancelled']"
-                            class="mb-6"
-                        />
+                        <flux:select wire:model.live="filterStatus" class="mb-6">
+                            <flux:select.option value="">{{ __('All Statuses') }}</flux:select.option>
+                            <flux:select.option value="pending">{{ __('Pending') }}</flux:select.option>
+                            <flux:select.option value="confirmed">{{ __('Confirmed') }}</flux:select.option>
+                            <flux:select.option value="completed">{{ __('Completed') }}</flux:select.option>
+                            <flux:select.option value="cancelled">{{ __('Cancelled') }}</flux:select.option>
+                        </flux:select>
 
                         <!-- Bookings List -->
                         @if($bookings->count())

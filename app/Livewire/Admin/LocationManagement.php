@@ -10,13 +10,13 @@ class LocationManagement extends Component
 {
     use WithPagination;
 
-    public $showModal = false;
-    public $editingId = null;
-    public $name = '';
-    public $description = '';
-    public $latitude = '';
-    public $longitude = '';
-    public $search = '';
+    public bool $showModal = false;
+    public ?int $editingId = null;
+    public string $name = '';
+    public string $description = '';
+    public ?string $latitude = null;
+    public ?string $longitude = null;
+    public string $search = '';
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -42,12 +42,12 @@ class LocationManagement extends Component
         $this->showModal = true;
     }
 
-    public function edit($id)
+    public function edit(int|string $id): void
     {
         $location = Location::findOrFail($id);
-        $this->editingId = $id;
+        $this->editingId = is_int($id) ? $id : (int) $id;
         $this->name = $location->name;
-        $this->description = $location->description;
+        $this->description = $location->description ?? '';
         $this->latitude = $location->latitude;
         $this->longitude = $location->longitude;
         $this->showModal = true;
@@ -80,7 +80,7 @@ class LocationManagement extends Component
         $this->resetPage();
     }
 
-    public function delete($id)
+    public function delete(int|string $id): void
     {
         Location::findOrFail($id)->delete();
         $this->dispatch('notify', message: 'Location deleted successfully!');

@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\SocialAuthController;
 use App\Livewire\Auth\AdminPhoneLogin;
 use App\Livewire\Auth\AdminRegisterVerify;
 use App\Livewire\Bookings\CreateBooking;
+use App\Livewire\Bookings\BookingIndex;
 use App\Models\User;
 
 Route::get('/', function () {
@@ -50,12 +51,14 @@ Route::middleware(['auth', 'verified', 'role.check'])->group(function () {
             return redirect()->route('login');
         }
 
-        // Otherwise redirect to role-specific dashboard
+        $query = request()->query();
+
+        // Otherwise redirect to role-specific dashboard with query string preserved
         return match($user->role) {
-            'tourist' => redirect()->route('dashboard.tourist'),
-            'provider' => redirect()->route('dashboard.provider'),
-            'admin' => redirect()->route('dashboard.admin'),
-            default => redirect()->route('dashboard.tourist'),
+            'tourist' => redirect()->route('dashboard.tourist', $query),
+            'provider' => redirect()->route('dashboard.provider', $query),
+            'admin' => redirect()->route('dashboard.admin', $query),
+            default => redirect()->route('dashboard.tourist', $query),
         };
     })->name('dashboard');
 });
@@ -63,11 +66,51 @@ Route::middleware(['auth', 'verified', 'role.check'])->group(function () {
 // Tourist Routes
 Route::middleware(['auth', 'verified', 'role.check', 'role:tourist'])->group(function () {
     Route::get('/dashboard/tourist', TouristDashboard::class)->name('dashboard.tourist');
+    // Park detail page
+    Route::get('/parks/{park}', \App\Livewire\Parks\ParkShow::class)->name('parks.show');
     Route::name('bookings.')->group(function () {
-        Route::get('/bookings', function () {
-            return view('livewire.bookings.index');
-        })->name('index');
+        Route::get('/bookings', BookingIndex::class)->name('index');
         Route::get('/bookings/create/{service}', CreateBooking::class)->name('create');
+        // Create or find a Service for a park and redirect to standard booking flow
+        Route::get('/bookings/create/park/{park}', function ($park) {
+            $parks = config('parks', []);
+            if (! isset($parks[$park])) {
+                abort(404);
+            }
+
+            $data = $parks[$park];
+
+            // Find a provider user (seeded) or first provider
+            $provider = \App\Models\User::where('role', 'provider')->first();
+            if (! $provider) {
+                abort(500, 'No provider user available for park bookings');
+            }
+
+            // Ensure location exists
+            $location = \App\Models\Location::firstOrCreate(['name' => $data['location']]);
+
+            // Create or update a Service representing this park
+            $service = \App\Models\Service::firstOrCreate(
+                ['name' => $data['name']],
+                [
+                    'provider_id' => $provider->id,
+                    'location_id' => $location->id,
+                    'description' => $data['name'] . ' - Park experience',
+                    'price' => $data['price'],
+                    'category' => 'Park',
+                    'status' => 'active',
+                    'rating' => 5,
+                    'image_url' => $data['image_url'],
+                ]
+            );
+
+            return redirect()->route('bookings.create', $service);
+        })->name('create.park');
+        Route::get('/bookings/{booking}', function (\App\Models\Booking $booking) {
+            abort_if($booking->tourist_id !== auth()->id(), 403);
+            $booking->load('service.location', 'service.provider');
+            return view('livewire.bookings.show', compact('booking'));
+        })->name('show');
     });
     Route::get('/locations', function () {
         return view('livewire.locations.tourist-index');
@@ -81,15 +124,9 @@ Route::middleware(['auth', 'verified', 'role.check', 'role:tourist'])->group(fun
 Route::middleware(['auth', 'verified', 'role.check', 'role:provider'])->group(function () {
     Route::get('/dashboard/provider', ProviderDashboard::class)->name('dashboard.provider');
     Route::name('services.')->group(function () {
-        Route::get('/services', function () {
-            return view('livewire.services.index');
-        })->name('index');
-        Route::get('/services/create', function () {
-            return view('livewire.services.create');
-        })->name('create');
-        Route::get('/services/{service}/edit', function () {
-            return view('livewire.services.edit');
-        })->name('edit');
+        Route::get('/services', \App\Livewire\Services\ServiceIndex::class)->name('index');
+            Route::get('/services/create', \App\Livewire\Services\ServiceForm::class)->name('create');
+            Route::get('/services/{service}/edit', \App\Livewire\Services\ServiceForm::class)->name('edit');
     });
 });
 
@@ -122,16 +159,13 @@ Route::middleware(['auth', 'verified', 'role.check', 'admin.check'])->group(func
 
         // Payments
         Route::name('payments.')->group(function () {
-            Route::get('/payments', function () {
-                return view('livewire.payments.index');
-            })->name('index');
+            Route::get('/payments', \App\Livewire\Admin\PaymentManagement::class)->name('index');
         });
 
         // Services
         Route::name('services.')->group(function () {
-            Route::get('/services', function () {
-                return view('livewire.services.index');
-            })->name('index');
+            Route::get('/services', \App\Livewire\Services\ServiceIndex::class)->name('index');
+            Route::get('/services/{service}/edit', \App\Livewire\Services\ServiceForm::class)->name('edit');
         });
 
         // Bookings

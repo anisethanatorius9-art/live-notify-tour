@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminAccessKey;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -216,8 +217,33 @@ class AdminRegisterController extends Controller
             'ZW' => 'Zimbabwe',
         ];
 
-        return view('livewire.auth.admin-register', ['countries' => $countries]);
+        $organizations = [
+            '' => 'Select Organization Type',
+            'tour_operator' => 'Tour Operator / Safari Company',
+            'hotel_resort' => 'Hotel / Resort / Lodge',
+            'national_park' => 'National Park / Wildlife Sanctuary',
+            'eco_lodge' => 'Eco-Lodge / Conservation Camp',
+            'accommodation_provider' => 'Accommodation Provider',
+            'travel_agency' => 'Travel Agency / Booking Office',
+            'cultural_tourism_site' => 'Cultural Tourism Site / Heritage',
+            'wildlife_conservancy' => 'Wildlife Conservancy / NGO',
+            'safari_camp' => 'Safari Camp / Tented Camp',
+            'adventure_travel' => 'Adventure Travel Company',
+            'destination_marketing' => 'Destination Marketing Organization',
+            'transport_service' => 'Transport & Transfer Service',
+            'cruise_boat' => 'Cruise / Boat Safari Operator',
+            'campground' => 'Campground / Campsite',
+            'holiday_villa' => 'Holiday Villa / Apartment',
+            'restaurant' => 'Restaurant / Dining Experience',
+            'other' => 'Other Tourism / Hospitality Organization',
+        ];
+
+        return view('livewire.auth.admin-register', [
+            'countries' => $countries,
+            'organizations' => $organizations,
+        ]);
     }
+
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -226,37 +252,66 @@ class AdminRegisterController extends Controller
             'password' => ['required', 'string', 'confirmed', 'min:8'],
             'country' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:25'],
-            'organization' => ['nullable', 'string', 'max:255'],
-            'admin_code' => ['required', 'string'],
+            'organization' => ['required', 'string', 'max:255'],
+            'admin_code' => ['nullable', 'string'],
         ]);
 
-        if ($data['admin_code'] !== config('admin.registration_code')) {
-            throw ValidationException::withMessages([
-                'admin_code' => __('The admin verification code is invalid.'),
+        if (! empty($data['admin_code'])) {
+            if ($data['admin_code'] !== config('admin.registration_code')) {
+                throw ValidationException::withMessages([
+                    'admin_code' => __('The admin verification code is invalid.'),
+                ]);
+            }
+
+            $otp = (string) random_int(100000, 999999);
+            Log::info('Admin registration verification SMS', [
+                'phone' => $data['phone'],
+                'code' => $otp,
             ]);
+
+            $request->session()->put('admin_registration', [
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'country' => $data['country'],
+                'phone' => $data['phone'],
+                'organization' => $data['organization'],
+                'role' => 'admin',
+                'role_selected_at' => now(),
+            ]);
+
+            $request->session()->put('admin_registration_otp', $otp);
+            $request->session()->put('admin_registration_otp_expires_at', now()->addMinutes(15)->timestamp);
+            $request->session()->flash('status', __('A verification code has been sent via SMS to :phone.', ['phone' => $data['phone']]));
+
+            return redirect()->route('admin.register.verify');
         }
 
-        $otp = (string) random_int(100000, 999999);
-        Log::info('Admin registration verification SMS', [
-            'phone' => $data['phone'],
-            'code' => $otp,
-        ]);
-
-        $request->session()->put('admin_registration', [
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'country' => $data['country'],
             'phone' => $data['phone'],
-            'organization' => $data['organization'] ?? null,
+            'organization' => $data['organization'],
             'role' => 'admin',
             'role_selected_at' => now(),
         ]);
 
-        $request->session()->put('admin_registration_otp', $otp);
-        $request->session()->put('admin_registration_otp_expires_at', now()->addMinutes(15)->timestamp);
-        $request->session()->flash('status', __('A verification code has been sent via SMS to :phone.', ['phone' => $data['phone']]));
+        $accessKey = AdminAccessKey::create([
+            'user_id' => $user->id,
+            'access_key' => hash('sha256', random_bytes(32)),
+            'is_active' => true,
+            'expires_at' => now()->addMonths(config('admin.access_key.expiry_months', 6)),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
-        return redirect()->route('admin.register.verify');
+        Auth::login($user);
+        $request->session()->regenerate();
+        $request->session()->flash('access_key_generated', true);
+        $request->session()->put('generated_access_key', $accessKey->access_key);
+
+        return redirect()->route('dashboard.admin');
     }
 }

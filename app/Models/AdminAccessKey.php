@@ -52,7 +52,7 @@ class AdminAccessKey extends Model
     /**
      * Scope a query to only active keys.
      */
-    public function scopeActive($query)
+    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_active', true);
     }

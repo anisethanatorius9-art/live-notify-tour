@@ -28,10 +28,6 @@
             @endif
 
             <!-- Bookings Table -->
-            @php
-            $bookings = auth()->user()->bookings()->with('service.location', 'service.provider')->latest()->get();
-            @endphp
-
             @if($bookings->count())
                 <flux:card class="overflow-hidden">
                     <flux:table>
@@ -107,9 +103,9 @@
                                 </flux:table.cell>
                                 <flux:table.cell class="text-end">
                                     <div class="flex items-center justify-end gap-2">
-                                        <flux:button size="sm" variant="ghost" icon="eye" href="#" />
+                                        <flux:button size="sm" variant="ghost" icon="eye" href="{{ route('bookings.show', $booking) }}" />
                                         @if($booking->status === 'pending')
-                                            <flux:button size="sm" variant="ghost" icon="trash" href="#" />
+                                            <flux:button size="sm" variant="ghost" icon="trash" wire:click="deleteBooking({{ $booking->id }})" wire:confirm="{{ __('Are you sure you want to delete this booking?') }}" />
                                         @endif
                                     </div>
                                 </flux:table.cell>

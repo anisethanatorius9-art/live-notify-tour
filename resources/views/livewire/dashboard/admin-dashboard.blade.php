@@ -28,7 +28,7 @@
                             <p class="text-gray-500 text-sm">{{ __('Total Users') }}</p>
                             <p class="text-3xl font-bold text-gray-900 mt-2">{{ $totalUsers }}</p>
                             <p class="text-xs text-gray-600 mt-2">
-                                👥 Tourists: {{ $totalTourists }} | 🏢 Providers: {{ $totalProviders }}
+                                Tourists: {{ $totalTourists }} | Providers: {{ $totalProviders }}
                             </p>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                             <p class="text-gray-500 text-sm">{{ __('Total Bookings') }}</p>
                             <p class="text-3xl font-bold text-green-600 mt-2">{{ $totalBookings }}</p>
                             <p class="text-xs text-gray-600 mt-2">
-                                ✅ Completed: {{ $completedBookings }} | ⏳ Pending: {{ $pendingBookings }}
+                                Completed: {{ $completedBookings }} | Pending: {{ $pendingBookings }}
                             </p>
                         </div>
                     </div>
@@ -88,9 +88,12 @@
                                 type="search"
                                 :placeholder="__('Search users...')"
                                 icon="magnifying-glass" />
-                            <flux:select
-                                wire:model.live="filterRole"
-                                :options="['' => 'All Roles', 'tourist' => 'Tourists', 'provider' => 'Providers', 'admin' => 'Admins']" />
+                            <flux:select wire:model.live="filterRole">
+                                <flux:select.option value="">{{ __('All Roles') }}</flux:select.option>
+                                <flux:select.option value="tourist">{{ __('Tourists') }}</flux:select.option>
+                                <flux:select.option value="provider">{{ __('Providers') }}</flux:select.option>
+                                <flux:select.option value="admin">{{ __('Admins') }}</flux:select.option>
+                            </flux:select>
                         </div>
 
                         <!-- Users Table -->

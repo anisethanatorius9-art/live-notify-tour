@@ -58,21 +58,18 @@
                 viewable
                 :error="$errors->first('password_confirmation')" />
 
-            <!-- Organization Name -->
-            <flux:input
+            <!-- Organization / Tourism Type -->
+            <flux:select
                 name="organization"
                 label="Organization / Company"
+                placeholder="Select organization type"
                 :value="old('organization')"
-                type="text"
-                placeholder="Organization name"
-                :error="$errors->first('organization')" />
-
-            @php
-            $countryList = [
-            'TZ' => 'Tanzania', 'KE' => 'Kenya', 'UG' => 'Uganda', 'RW' => 'Rwanda', 'US' => 'United States', 'GB' => 'United Kingdom'
-            // ... you can keep your full list here
-            ];
-            @endphp
+                :error="$errors->first('organization')"
+                required>
+                @foreach($organizations as $value => $label)
+                    <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
+                @endforeach
+            </flux:select>
 
             <flux:select
                 name="country"
@@ -81,8 +78,8 @@
                 :value="old('country')"
                 :error="$errors->first('country')"
                 required>
-                @foreach($countryList as $code => $name)
-                <flux:select.option value="{{ $code }}">{{ $name }}</flux:select.option>
+                @foreach($countries as $code => $name)
+                    <flux:select.option value="{{ $code }}">{{ $name }}</flux:select.option>
                 @endforeach
             </flux:select>
 
@@ -97,29 +94,22 @@
 
             <hr class="border-zinc-200 dark:border-zinc-700" />
 
-            <!-- Admin Verification Section -->
+            <!-- Optional Verification Code -->
             <div class="space-y-4">
                 <div class="text-center space-y-2">
-                    <flux:label>Admin Verification Code</flux:label>
-                    <flux:text size="sm">Please enter the one-time password sent to your phone.</flux:text>
+                    <flux:label>Admin Verification Code (optional)</flux:label>
+                    <flux:text size="sm">If you already have the admin registration code, enter it here; otherwise you can leave it blank.</flux:text>
                 </div>
 
                 <flux:otp
                     name="admin_code"
                     length="6"
                     :error="$errors->first('admin_code')"
-                    class="mx-auto"
-                    required />
+                    class="mx-auto" />
 
                 <div class="flex flex-col gap-2">
-                    <!-- The primary "Verify & Register" button -->
                     <flux:button variant="primary" type="submit" class="w-full">
-                        Verify & Create Account
-                    </flux:button>
-
-                    <!-- Resend Button (using wire:click if this is a Livewire component) -->
-                    <flux:button variant="ghost" type="button" class="w-full border border-zinc-200 dark:border-zinc-700" id="resend-btn">
-                        Resend code
+                        Create Account
                     </flux:button>
                 </div>
             </div>

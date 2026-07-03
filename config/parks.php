@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'maasai-mara' => [
+        'name' => 'Maasai Mara National Reserve',
+        'location' => 'Kenya',
+        'flag' => 'KE',
+        'price' => 15000,
+        'currency' => 'KES',
+        'image_url' => 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80',
+    ],
+    'serengeti' => [
+        'name' => 'Serengeti National Park',
+        'location' => 'Tanzania',
+        'flag' => 'TZ',
+        'price' => 250000,
+        'currency' => 'TZS',
+        'image_url' => 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=80',
+    ],
+    'amboseli' => [
+        'name' => 'Amboseli National Park',
+        'location' => 'Kenya',
+        'flag' => 'KE',
+        'price' => 12000,
+        'currency' => 'KES',
+        'image_url' => 'https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1400&q=80',
+    ],
+    'volcanoes' => [
+        'name' => 'Volcanoes National Park',
+        'location' => 'Rwanda',
+        'flag' => 'RW',
+        'price' => 100000,
+        'currency' => 'RWF',
+        'image_url' => 'https://images.unsplash.com/photo-1513415564515-763d91423bdd?auto=format&fit=crop&w=1400&q=80',
+    ],
+    'lake-nakuru' => [
+        'name' => 'Lake Nakuru National Park',
+        'location' => 'Kenya',
+        'flag' => 'KE',
+        'price' => 9000,
+        'currency' => 'KES',
+        'image_url' => 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1400&q=80',
+    ],
+    'ngorongoro' => [
+        'name' => 'Ngorongoro Conservation Area',
+        'location' => 'Tanzania',
+        'flag' => 'TZ',
+        'price' => 220000,
+        'currency' => 'TZS',
+        'image_url' => 'https://images.unsplash.com/photo-1483683804023-6ccdb62f86ef?auto=format&fit=crop&w=1400&q=80',
+    ],
+    'tsavo-east' => [
+        'name' => 'Tsavo East National Park',
+        'location' => 'Kenya',
+        'flag' => 'KE',
+        'price' => 13000,
+        'currency' => 'KES',
+        'image_url' => 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80',
+    ],
+    'akagera' => [
+        'name' => 'Akagera National Park',
+        'location' => 'Rwanda',
+        'flag' => 'RW',
+        'price' => 95000,
+        'currency' => 'RWF',
+        'image_url' => 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80',
+    ],
+];
