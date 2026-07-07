@@ -32,7 +32,7 @@
                             wire:model.live="search"
                             type="search"
                             placeholder="{{ __('Search services, locations...') }}"
-                            class="w-full px-4 py-2 md:py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-sm md:text-base" />
+                            class="w-full px-4 py-2 md:py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:border-blue-400 dark:focus:ring-blue-900 outline-none transition text-sm md:text-base" />
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                             <select
