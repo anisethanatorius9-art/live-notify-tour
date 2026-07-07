@@ -161,4 +161,20 @@ class TouristDashboard extends Component
             'totalNotifications' => $user->notifications()->count(),
         ]);
     }
+
+    /**
+     * Handle avatar selection (defensive method for cases where call is routed here)
+     */
+    public function selectAvatar($avatar = ''): void
+    {
+        // This method is called from the profile settings page but may be routed here
+        // Update user's profile photo
+        if (!empty($avatar)) {
+            $user = Auth::user();
+            if ($user) {
+                $user->profile_photo = $avatar;
+                $user->save();
+            }
+        }
+    }
 }
