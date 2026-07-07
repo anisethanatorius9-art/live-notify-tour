@@ -1,7 +1,7 @@
 @props(['user' => auth()->user()])
 
 @php
-    $user = $user ?? auth()->user();
+$user = $user ?? auth()->user();
 @endphp
 
 <flux:sidebar sticky collapsible="mobile" class="bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700">
@@ -31,8 +31,7 @@
                 type="search"
                 value="{{ request('search') }}"
                 placeholder="{{ __('Search parks, services...') }}"
-                class="h-10 w-full rounded-lg border border-zinc-200 bg-white px-10 pr-12 text-sm text-zinc-700 placeholder:text-zinc-400 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-            />
+                class="h-10 w-full rounded-lg border border-zinc-200 bg-white px-10 pr-12 text-sm text-zinc-700 placeholder:text-zinc-400 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
             <button type="submit" class="absolute inset-y-0 end-0 flex items-center justify-center px-3 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white">
                 <flux:icon class="size-4" icon="magnifying-glass" variant="outline" />
             </button>
@@ -190,19 +189,26 @@
     {{-- User Profile Dropdown - Only show if user is logged in --}}
     @auth
     <flux:dropdown position="top" align="start" class="max-lg:hidden px-3 pb-3">
-        <flux:sidebar.profile
-            :avatar="$user->profile_photo ?? 'https://fluxui.dev/img/demo/user.png'"
-            :name="$user->name" />
+        <div class="block w-full cursor-pointer" data-test="profile-avatar-link">
+            <flux:sidebar.profile
+                :avatar="$user->profile_photo ?? 'https://fluxui.dev/img/demo/user.png'"
+                :name="$user->name" />
+        </div>
 
         <flux:menu>
             <flux:menu.item icon="user" href="{{ route('profile.edit') }}">Profile</flux:menu.item>
             <flux:menu.item icon="cog-6-tooth" href="{{ route('profile.edit') }}">Settings</flux:menu.item>
             <flux:menu.separator />
 
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
-                <flux:menu.item type="button" onclick="this.closest('form').submit();" icon="arrow-right-start-on-rectangle">
-                    Logout
+                <flux:menu.item
+                    as="button"
+                    type="submit"
+                    icon="arrow-right-start-on-rectangle"
+                    class="w-full cursor-pointer"
+                    data-test="logout-button">
+                    {{ __('Log out') }}
                 </flux:menu.item>
             </form>
         </flux:menu>

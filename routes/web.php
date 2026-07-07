@@ -36,7 +36,8 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/admin/register', [AdminRegisterController::class, 'store'])->name('admin.register.store');
     Route::get('/admin/register/verify', AdminRegisterVerify::class)->name('admin.register.verify');
 
-    // Phone-based admin OTP login
+    // Email-based admin OTP login
+    Route::get('/admin/login/email', AdminPhoneLogin::class)->name('admin.login.email');
     Route::get('/admin/login/phone', AdminPhoneLogin::class)->name('admin.login.phone');
 
     // User login routes

@@ -2,9 +2,12 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Mail\AdminOtpEmail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Fortify\Features;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -41,6 +44,50 @@ class AuthenticationTest extends TestCase
         $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'wrong-password',
+        ]);
+
+        $response->assertSessionHasErrorsIn('email');
+
+        $this->assertGuest();
+    }
+
+    public function test_users_can_authenticate_with_mixed_case_email(): void
+    {
+        $user = User::factory()->withoutTwoFactor()->create(['email' => 'user@example.com']);
+
+        $response = $this->post(route('login.store'), [
+            'email' => 'USER@EXAMPLE.COM',
+            'password' => 'password',
+        ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_admin_email_login_sends_otp_to_the_normalized_email_input(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->create(['role' => 'admin', 'email' => 'Admin@Example.com']);
+
+        Livewire::test(\App\Livewire\Auth\AdminPhoneLogin::class)
+            ->set('email', 'Admin@Example.com')
+            ->call('sendOtp');
+
+        Mail::assertSent(AdminOtpEmail::class, function (AdminOtpEmail $mail) {
+            return $mail->hasTo('admin@example.com');
+        });
+    }
+
+    public function test_admin_users_cannot_authenticate_using_regular_login_screen(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $admin->email,
+            'password' => 'password',
         ]);
 
         $response->assertSessionHasErrorsIn('email');

@@ -4,7 +4,7 @@
 
         <!-- Alert: Admin Only -->
         <div class="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-            <flux:icon.exclamation-circle class="text-amber-600 mt-1" />
+            <flux:icon.exclamation-circle class="text-amber-600 mt-1"></flux:icon.exclamation-circle>
             <div class="flex-1">
                 <p class="text-sm font-medium text-amber-900">Admin Registration</p>
                 <p class="text-sm text-amber-800">Please provide valid information and your phone number for SMS verification.</p>

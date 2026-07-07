@@ -1,5 +1,4 @@
-<x-layouts.auth>
-    <div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6">
         <x-auth-header :title="__('Phone Login')" :description="__('Verify your identity using your phone number and OTP')" />
 
         <!-- Session Status -->
@@ -45,7 +44,7 @@
                 </div>
 
                 <form wire:submit.prevent="verifyOtp" class="flex flex-col gap-4">
-                    <flux:otp wire:model="code" length="6" label="OTP Code" label:sr-only :error:icon="false" error:class="text-center" class="mx-auto" />
+                    <flux:otp wire:model="code" length="6" label="OTP Code" label:sr-only :error:icon="false" error:class="text-center" class="mx-auto"></flux:otp>
 
                     <div class="space-y-3">
                         <flux:button variant="primary" type="submit" class="w-full">
@@ -65,4 +64,3 @@
             <flux:link :href="route('login')" wire:navigate>{{ __('Login with Email') }}</flux:link>
         </div>
     </div>
-</x-layouts.auth>

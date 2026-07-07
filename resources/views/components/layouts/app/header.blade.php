@@ -45,10 +45,12 @@
 
             <!-- Desktop User Menu -->
             <flux:dropdown position="top" align="end">
-                <flux:profile
-                    class="cursor-pointer"
-                    :initials="auth()->user()->initials()"
-                />
+                <div class="block cursor-pointer" data-test="profile-avatar-link">
+                    <flux:profile
+                        class="cursor-pointer"
+                        :initials="auth()->user()->initials()"
+                    />
+                </div>
 
                 <flux:menu>
                     <flux:menu.radio.group>

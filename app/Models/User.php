@@ -30,6 +30,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  */
 class User extends Authenticatable
 {
+    public const ADMIN_ROLE_VALUES = ['admin', 'super_admin', 'administrator'];
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
@@ -63,6 +65,22 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'remember_token',
     ];
+
+    /**
+     * Normalize email addresses to lowercase before persisting them.
+     */
+    public function setEmailAttribute($value): void
+    {
+        $this->attributes['email'] = Str::lower(trim((string) $value));
+    }
+
+    /**
+     * Find a user by email in a case-insensitive way.
+     */
+    public static function findByEmail(string $email): ?self
+    {
+        return static::whereRaw('LOWER(email) = ?', [Str::lower(trim($email))])->first();
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -147,7 +165,7 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, self::ADMIN_ROLE_VALUES, true);
     }
 
     /**

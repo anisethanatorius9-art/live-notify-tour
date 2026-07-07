@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 
@@ -29,12 +31,19 @@ class AdminLoginController extends Controller
         }
 
         // Standard email/password login
-        if (! Auth::attempt(['email' => $data['email'], 'password' => $data['password'], 'role' => 'admin'], $request->boolean('remember'))) {
+        $normalizedEmail = Str::lower(trim($data['email']));
+        $user = User::query()
+            ->where('role', 'admin')
+            ->whereRaw('LOWER(email) = ?', [$normalizedEmail])
+            ->first();
+
+        if (! $user || ! Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => __('The provided credentials do not match our records or you do not have admin access.'),
             ]);
         }
 
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard.admin'));

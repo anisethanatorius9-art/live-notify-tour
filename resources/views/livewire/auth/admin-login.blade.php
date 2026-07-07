@@ -7,7 +7,7 @@
 
         <!-- Alert: Admin Only -->
         <div class="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-            <flux:icon.exclamation-circle class="text-blue-600 mt-1" />
+            <flux:icon.exclamation-circle class="text-blue-600 mt-1"></flux:icon.exclamation-circle>
             <div class="flex-1">
                 <p class="text-sm font-medium text-blue-900">Admin Area</p>
                 <p class="text-sm text-blue-800">Authorized Administrators Only</p>
@@ -58,7 +58,7 @@
                 :error="$errors->first('admin_key')" />
 
             <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
+            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')"></flux:checkbox>
 
             <div class="flex items-center justify-end gap-4">
                 <flux:link :href="route('login')" wire:navigate class="text-sm">
@@ -77,11 +77,11 @@
             <div class="flex-1 border-t border-zinc-200 dark:border-zinc-700"></div>
         </div>
 
-        <!-- Phone Login Option -->
-        <flux:link :href="route('admin.login.phone')" wire:navigate class="w-full">
+        <!-- Email OTP Login Option -->
+        <flux:link :href="route('admin.login.email')" wire:navigate class="w-full">
             <flux:button variant="outline" type="button" class="w-full">
-                <flux:icon.phone class="mr-2 h-5 w-5" />
-                {{ __('Login with Phone & OTP') }}
+                <flux:icon.phone class="mr-2 h-5 w-5"></flux:icon.phone>
+                {{ __('Login with Email OTP') }}
             </flux:button>
         </flux:link>
 

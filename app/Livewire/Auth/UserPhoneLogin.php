@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
+#[\Livewire\Attributes\Layout('components.layouts.auth.simple')]
 class UserPhoneLogin extends Component
 {
     public string $phone = '';

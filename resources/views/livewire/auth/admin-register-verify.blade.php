@@ -1,5 +1,4 @@
-<x-layouts.auth>
-    <div class="max-w-lg mx-auto">
+<div class="max-w-lg mx-auto">
         <flux:card>
             <form wire:submit.prevent="verify" class="space-y-8">
                 <div class="max-w-64 mx-auto space-y-2 text-center">
@@ -16,7 +15,7 @@
                     </div>
                 @endif
 
-                <flux:otp wire:model="code" length="6" label="OTP Code" label:sr-only :error:icon="false" error:class="text-center" class="mx-auto" />
+                <flux:otp wire:model="code" length="6" label="OTP Code" label:sr-only :error:icon="false" error:class="text-center" class="mx-auto"></flux:otp>
 
                 <div class="space-y-4">
                     <flux:button variant="primary" type="submit" class="w-full">Verify</flux:button>
@@ -25,4 +24,3 @@
             </form>
         </flux:card>
     </div>
-</x-layouts.auth>

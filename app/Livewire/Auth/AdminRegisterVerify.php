@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
+#[\Livewire\Attributes\Layout('components.layouts.auth.simple')]
 class AdminRegisterVerify extends Component
 {
     public $code = '';

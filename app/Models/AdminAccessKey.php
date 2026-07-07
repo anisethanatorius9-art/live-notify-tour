@@ -5,6 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $access_key
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property \Illuminate\Support\Carbon|null $last_used_at
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ */
 class AdminAccessKey extends Model
 {
     protected $fillable = [

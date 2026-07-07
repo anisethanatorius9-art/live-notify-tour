@@ -18,6 +18,18 @@ class ProfileUpdateTest extends TestCase
         $this->get(route('profile.edit'))->assertOk();
     }
 
+    public function test_dashboard_avatar_links_to_the_profile_page(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $response = $this->get(route('dashboard'));
+
+        $response->assertRedirect();
+        $this->followRedirects($response)
+            ->assertSee('data-test="profile-avatar-link"', false)
+            ->assertSee(route('profile.edit'), false);
+    }
+
     public function test_profile_information_can_be_updated(): void
     {
         $user = User::factory()->create();

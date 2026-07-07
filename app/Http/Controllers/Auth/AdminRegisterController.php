@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -255,6 +256,8 @@ class AdminRegisterController extends Controller
             'organization' => ['required', 'string', 'max:255'],
             'admin_code' => ['nullable', 'string'],
         ]);
+
+        $data['email'] = Str::lower(trim($data['email']));
 
         if (! empty($data['admin_code'])) {
             if ($data['admin_code'] !== config('admin.registration_code')) {

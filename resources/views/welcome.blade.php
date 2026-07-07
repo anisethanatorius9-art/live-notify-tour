@@ -137,15 +137,15 @@
 <body>
     <div class="relative min-h-screen">
 
-        <!-- Background Slider (Picha za Wanyama, Hotel, Chakula) -->
+
         <div class="hero-slider">
-            <!-- Picha 1: Simba (Wildlife) -->
+
             <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1546182990-dffeafbe841d?q=80&w=2000')"></div>
-            <!-- Picha 2: Hotel ya Kifahari Zanzibar -->
+
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2000')"></div>
-            <!-- Picha 3: Chakula cha Kitanzania/Mataunda -->
+
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2000')"></div>
-            <!-- Picha 4: Tembo Serengeti -->
+
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?q=80&w=2000')"></div>
         </div>
 

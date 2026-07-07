@@ -69,9 +69,9 @@ new class extends Component {
         $this->dispatch('profile-updated', name: $user->name);
     }
 
-    public function selectAvatar(string $avatar): void
+    public function selectAvatar($avatar = ''): void
     {
-        $this->profilePhoto = $avatar;
+        $this->profilePhoto = (string) $avatar;
     }
 
     /**
@@ -141,6 +141,7 @@ new class extends Component {
                             <button
                                 type="button"
                                 wire:click="selectAvatar('{{ $avatar }}')"
+                                wire:key="avatar-{{ $loop->index }}"
                                 class="rounded-xl border p-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 {{ $profilePhoto === $avatar ? 'border-blue-600 ring-2 ring-blue-200 dark:ring-blue-500' : 'border-gray-200 dark:border-zinc-700' }}"
                             >
                                 <img src="{{ $avatar }}" alt="{{ __('Avatar option') }}" class="h-20 w-full rounded-xl object-cover" />

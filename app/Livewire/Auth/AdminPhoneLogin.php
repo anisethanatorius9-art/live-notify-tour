@@ -2,278 +2,144 @@
 
 namespace App\Livewire\Auth;
 
+use App\Mail\AdminOtpEmail;
 use App\Models\AdminAccessKey;
 use App\Models\PhoneVerificationOtp;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class AdminPhoneLogin extends Component
 {
-    public string $phone = '';
+    public string $email = '';
     public string $code = '';
-    public ?string $formattedPhone = null;
     public ?string $statusMessage = null;
-    public ?string $statusPhone = null;
+    public ?string $statusEmail = null;
     public bool $showOtpForDebug = false;
-    public string $country = 'TZ';
-    public string $otpChannel = 'SMS';
     public ?string $step = null;
 
-    protected array $callingCodes = [
-        'US' => '+1',
-        'KE' => '+254',
-        'TZ' => '+255',
-        'UG' => '+256',
-        'RW' => '+250',
-        'BI' => '+257',
-        'CD' => '+243',
-        'SS' => '+211',
-        'ET' => '+251',
-        'SO' => '+252',
-        'DJ' => '+253',
-        'ER' => '+291',
-        'SD' => '+249',
-    ];
-
+    #[\Livewire\Attributes\Layout('components.layouts.auth.simple')]
     public function mount(): void
     {
-        $this->showOtpForDebug = env('SMS_DEBUG', false);
+        $this->showOtpForDebug = env('MAIL_DEBUG', false);
         $this->step = request()->query('step');
 
-        // Check if there's an existing OTP session
-        $loginData = session('admin_phone_login');
+        // If an email is provided as a query parameter, prefill the form field so
+        // users hitting the URL (for example from a link) see their email and can
+        // request a code. Do not auto-send the OTP on GET to avoid sending mail
+        // unexpectedly.
+        $queryEmail = request()->query('email');
+        if ($queryEmail && ! session()->has('admin_email_login')) {
+            $this->email = rawurldecode((string) $queryEmail);
+        }
+
+        $loginData = session('admin_email_login');
         if ($loginData) {
-            $this->phone = $loginData['phone'];
-            $this->country = $loginData['country'];
-            $this->formattedPhone = $this->formatPhone($this->phone, $this->country);
-            $this->otpChannel = $this->getOtpChannel();
-            $this->statusPhone = $this->formattedPhone;
-            $this->statusMessage = __('A verification code has been sent via :channel to :phone.', [
-                'channel' => $this->otpChannel,
-                'phone' => $this->statusPhone,
+            $this->email = $loginData['email'];
+            $this->statusEmail = $this->email;
+            $this->statusMessage = __('A verification code has been sent to :email. Check your inbox and spam folder.', [
+                'email' => $this->statusEmail,
             ]);
+            $this->step = 'verify';
         }
-    }
-
-    protected function sendSmsToPhone(string $phone, string $message, ?PhoneVerificationOtp $otpRecord = null): bool
-    {
-        $provider = env('SMS_PROVIDER', 'log');
-
-        if ($provider === 'twilio') {
-            $accountSid = env('TWILIO_ACCOUNT_SID');
-            $authToken = env('TWILIO_AUTH_TOKEN');
-            $from = env('TWILIO_FROM');
-
-            if (! $accountSid || ! $authToken || ! $from) {
-                Log::warning('Twilio SMS configuration is missing.');
-                return false;
-            }
-
-            $response = Http::withBasicAuth($accountSid, $authToken)
-                ->asForm()
-                ->post("https://api.twilio.com/2010-04-01/Accounts/{$accountSid}/Messages.json", [
-                    'From' => $from,
-                    'To' => $phone,
-                    'Body' => $message,
-                ]);
-
-            if ($response->failed()) {
-                Log::error('Twilio SMS failed.', [
-                    'phone' => $phone,
-                    'response' => $response->body(),
-                ]);
-                if ($otpRecord) {
-                    $otpRecord->update([
-                        'sms_status' => 'failed',
-                        'sms_response' => $response->body(),
-                    ]);
-                }
-                return false;
-            }
-
-            if ($otpRecord) {
-                $otpRecord->update([
-                    'sms_status' => 'sent',
-                    'sms_response' => $response->body(),
-                ]);
-            }
-            return true;
-        }
-
-        if ($provider === 'twilio_whatsapp') {
-            $accountSid = env('TWILIO_ACCOUNT_SID');
-            $authToken = env('TWILIO_AUTH_TOKEN');
-            $from = env('TWILIO_WHATSAPP_FROM', env('TWILIO_FROM'));
-
-            if (! $accountSid || ! $authToken || ! $from) {
-                Log::warning('Twilio WhatsApp configuration is missing.');
-                return false;
-            }
-
-            $response = Http::withBasicAuth($accountSid, $authToken)
-                ->asForm()
-                ->post("https://api.twilio.com/2010-04-01/Accounts/{$accountSid}/Messages.json", [
-                    'From' => $this->formatWhatsappAddress($from),
-                    'To' => $this->formatWhatsappAddress($phone),
-                    'Body' => $message,
-                ]);
-
-            if ($response->failed()) {
-                Log::error('Twilio WhatsApp failed.', [
-                    'phone' => $phone,
-                    'response' => $response->body(),
-                ]);
-                if ($otpRecord) {
-                    $otpRecord->update([
-                        'sms_status' => 'failed',
-                        'sms_response' => $response->body(),
-                    ]);
-                }
-                return false;
-            }
-
-            if ($otpRecord) {
-                $otpRecord->update([
-                    'sms_status' => 'sent',
-                    'sms_response' => $response->body(),
-                ]);
-            }
-            return true;
-        }
-
-        if ($provider === 'log' || app()->environment('local')) {
-            Log::info('SMS debug message', [
-                'to' => $phone,
-                'message' => $message,
-                'otp_id' => $otpRecord?->id,
-            ]);
-            return true;
-        }
-
-        Log::warning('SMS provider is not configured.', ['provider' => $provider]);
-
-        return false;
-    }
-
-    protected function formatWhatsappAddress(string $number): string
-    {
-        $sanitized = preg_replace('/[\s\-\(\)]+/', '', $number);
-
-        return str_starts_with($sanitized, 'whatsapp:') ? $sanitized : "whatsapp:{$sanitized}";
-    }
-
-    protected function getOtpChannel(): string
-    {
-        return env('SMS_PROVIDER', 'log') === 'twilio_whatsapp' ? 'WhatsApp' : 'SMS';
-    }
-
-    public function updatedPhone(): void
-    {
-        $this->formattedPhone = $this->formatPhone($this->phone, $this->country);
-    }
-
-    public function updatedCountry(): void
-    {
-        $this->formattedPhone = $this->formatPhone($this->phone, $this->country);
     }
 
     public function sendOtp(): void
     {
         $this->validate([
-            'phone' => ['required', 'string', 'min:7', 'max:20'],
-            'country' => ['required', 'string', 'size:2'],
+            'email' => ['required', 'email'],
         ]);
 
-        // Sanitize phone: remove spaces, dashes, parentheses
-        $this->phone = preg_replace('/[\s\-\(\)]/', '', $this->phone);
-
-        $user = User::where('phone', $this->phone)
-            ->where('country', $this->country)
-            ->where('role', 'admin')
+        $cleanEmail = Str::lower(trim($this->email));
+        $user = User::query()
+            ->whereRaw('LOWER(email) = ?', [$cleanEmail])
+            ->whereIn('role', User::ADMIN_ROLE_VALUES)
             ->first();
 
         if (! $user) {
-            $this->addError('phone', 'No admin account found with this phone number.');
+            $this->addError('email', __('No admin account found with this email address.'));
             return;
         }
 
-        // Generate a unique OTP (guaranteed to be different from all other OTPs)
         $otp = PhoneVerificationOtp::generateUniqueOtp();
+        $accessKey = $this->createAccessKey($user);
 
-        // Create OTP record in database
         $otpRecord = PhoneVerificationOtp::create([
             'user_id' => $user->id,
             'otp' => $otp,
-            'phone' => $this->phone,
-            'country' => $this->country,
+            'email' => $this->email,
+            'phone' => '',
+            'country' => '',
             'is_verified' => false,
             'expires_at' => now()->addMinutes(10),
-            'sms_status' => 'pending',
+            'sms_status' => null,
         ]);
 
-        // Store minimal data in session for quick access
-        session()->put('admin_phone_login', [
+        $normalizedEmail = Str::lower(trim($this->email));
+
+        session()->put('admin_email_login', [
             'user_id' => $user->id,
-            'phone' => $this->phone,
-            'country' => $this->country,
+            'email' => $this->email,
+            'normalized_email' => $normalizedEmail,
             'otp_id' => $otpRecord->id,
+            'access_key_id' => $accessKey->id,
         ]);
 
-        $this->formattedPhone = $this->formatPhone($this->phone, $this->country);
-        $this->otpChannel = $this->getOtpChannel();
-        $this->statusPhone = $this->formattedPhone;
-
-        $message = __('Your LTN admin login code is :code. This code expires in 10 minutes.', ['code' => $otp]);
-        $sent = $this->sendSmsToPhone($this->formattedPhone, $message, $otpRecord);
-
-        if (! $sent) {
-            // Mark SMS as failed in database
-            $otpRecord->update(['sms_status' => 'failed']);
-            $this->addError('phone', __('Unable to send verification code. Please check your phone number and try again. If the problem persists, contact support.'));
+        try {
+            Mail::to($normalizedEmail)->send(new AdminOtpEmail($otp, $accessKey->access_key));
+        } catch (\Throwable $exception) {
+            Log::error('Admin email OTP failed', [
+                'user_id' => $user->id,
+                'email' => $this->email,
+                'error' => $exception->getMessage(),
+            ]);
+            $this->addError('email', __('Unable to send the verification code. Please try again later.'));
             return;
         }
 
-        // Mark SMS as sent in database
-        $otpRecord->update(['sms_status' => 'sent']);
-
         if ($this->showOtpForDebug) {
-            session()->put('admin_phone_login_otp_display', $otp);
+            session()->put('admin_email_login_otp_display', $otp);
         }
 
-        $this->statusMessage = __('A verification code has been sent via :channel to :phone. Please check your phone.', [
-            'channel' => $this->otpChannel,
-            'phone' => $this->statusPhone,
+        $this->statusEmail = $this->email;
+        $this->statusMessage = __('A verification code has been sent to :email. Check your inbox and spam folder.', [
+            'email' => $this->statusEmail,
         ]);
-
-        Log::info('Admin phone login OTP sent', [
-            'user_id' => $user->id,
-            'phone' => $this->phone,
-            'otp_id' => $otpRecord->id,
-            'sms_status' => 'sent',
-        ]);
-
         $this->step = 'verify';
+
+        Log::info('Admin email login OTP sent', [
+            'user_id' => $user->id,
+            'email' => $this->email,
+            'otp_id' => $otpRecord->id,
+        ]);
+
+        // Include the normalized email in the redirect so the verification view
+        // can display which address the code was sent to and keep the field
+        // prefilled for the user.
+        $this->redirectRoute('admin.login.email', [
+            'step' => 'verify',
+            'email' => $normalizedEmail,
+        ]);
     }
 
-    public function useDifferentNumber(): void
+    public function useDifferentEmail(): void
     {
         session()->forget([
-            'admin_phone_login',
-            'admin_phone_login_last_resent_at',
-            'admin_phone_login_otp_display',
+            'admin_email_login',
+            'admin_email_login_last_resent_at',
+            'admin_email_login_otp_display',
         ]);
 
-        $this->phone = '';
+        $this->email = '';
         $this->code = '';
-        $this->formattedPhone = null;
         $this->statusMessage = null;
-        $this->otpChannel = 'SMS';
+        $this->statusEmail = null;
         $this->step = null;
 
-        $this->redirectRoute('admin.login.phone');
+        $this->redirectRoute('admin.login.email');
     }
 
     public function verifyOtp(): void
@@ -282,35 +148,30 @@ class AdminPhoneLogin extends Component
             'code' => ['required', 'digits:6'],
         ]);
 
-        $loginData = session('admin_phone_login');
+        $loginData = session('admin_email_login');
         if (! $loginData) {
             $this->addError('code', 'Session expired. Please request a new code.');
             return;
         }
 
-        // Retrieve OTP from database
         $otpRecord = PhoneVerificationOtp::find($loginData['otp_id'] ?? null);
         if (! $otpRecord) {
             $this->addError('code', 'The verification code is invalid or expired.');
             return;
         }
 
-        // Record this verification attempt
         $otpRecord->recordAttempt();
 
-        // Check if too many failed attempts
         if ($otpRecord->hasTooManyAttempts()) {
             $this->addError('code', 'Too many failed attempts. Please request a new code.');
             return;
         }
 
-        // Check if OTP has expired
         if ($otpRecord->hasExpired()) {
             $this->addError('code', 'The verification code has expired. Please request a new code.');
             return;
         }
 
-        // Check if OTP is correct
         if ($otpRecord->otp !== $this->code) {
             $this->addError('code', 'The verification code is incorrect. Please try again.');
             return;
@@ -322,28 +183,26 @@ class AdminPhoneLogin extends Component
             return;
         }
 
-        // Mark OTP as verified
         $otpRecord->markAsVerified();
 
-        // Generate or retrieve an admin access key for the user
-        $accessKey = $this->getOrCreateAccessKey($user);
+        $accessKey = AdminAccessKey::find($loginData['access_key_id'] ?? null);
+        if (! $accessKey || ! $accessKey->isValid()) {
+            $accessKey = $this->createAccessKey($user);
+        }
 
         Auth::login($user);
 
-        // Clean up session data
         session()->forget([
-            'admin_phone_login',
-            'admin_phone_login_otp_display',
+            'admin_email_login',
+            'admin_email_login_otp_display',
         ]);
 
         session()->regenerate();
         session()->flash('access_key_generated', true);
         session()->flash('status', __('Logged in successfully. Your admin access key has been provided below.'));
-
-        // Store the key temporarily in session for display after redirect
         session()->put('generated_access_key', $accessKey->access_key);
 
-        Log::info('Admin phone login verified', [
+        Log::info('Admin email login verified', [
             'user_id' => $user->id,
             'otp_id' => $otpRecord->id,
         ]);
@@ -353,82 +212,77 @@ class AdminPhoneLogin extends Component
 
     public function resend(): void
     {
-        $loginData = session('admin_phone_login');
+        $loginData = session('admin_email_login');
 
         if (! $loginData) {
             $this->addError('code', 'Session expired. Please request a new code.');
             return;
         }
 
-        // Rate limiting: prevent resends faster than 60 seconds
-        $lastResentAt = session('admin_phone_login_last_resent_at');
+        $lastResentAt = session('admin_email_login_last_resent_at');
         if ($lastResentAt && now()->timestamp - $lastResentAt < 60) {
             $this->statusMessage = 'Please wait 60 seconds before requesting a new code.';
             return;
         }
 
-        // Generate a new unique OTP (guaranteed different from previous one)
         $otp = PhoneVerificationOtp::generateUniqueOtp();
 
-        // Create new OTP record in database
-        $otpRecord = PhoneVerificationOtp::create([
-            'user_id' => $loginData['user_id'],
-            'otp' => $otp,
-            'phone' => $loginData['phone'],
-            'country' => $loginData['country'],
-            'is_verified' => false,
-            'expires_at' => now()->addMinutes(10),
-            'sms_status' => 'pending',
-        ]);
-
-        // Update session with new OTP ID
-        $loginData['otp_id'] = $otpRecord->id;
-        session()->put('admin_phone_login', $loginData);
-        session()->put('admin_phone_login_last_resent_at', now()->timestamp);
-
-        $message = __('Your new LTN admin login code is :code. This code expires in 10 minutes.', ['code' => $otp]);
-        $sent = $this->sendSmsToPhone($this->formattedPhone, $message, $otpRecord);
-
-        if (! $sent) {
-            // Mark SMS as failed in database
-            $otpRecord->update(['sms_status' => 'failed']);
-            $this->addError('code', __('Unable to send verification code. Please try again or contact support.'));
+        $user = User::find($loginData['user_id']);
+        if (! $user) {
+            $this->addError('code', 'User not found.');
             return;
         }
 
-        // Mark SMS as sent in database
-        $otpRecord->update(['sms_status' => 'sent']);
+        $accessKey = $this->createAccessKey($user);
 
-        if ($this->showOtpForDebug) {
-            session()->put('admin_phone_login_otp_display', $otp);
-        }
-
-        $this->otpChannel = $this->getOtpChannel();
-        $message = __('A new verification code has been sent via :channel to :phone. Please check your phone.', [
-            'channel' => $this->otpChannel,
-            'phone' => $this->formattedPhone,
+        $otpRecord = PhoneVerificationOtp::create([
+            'user_id' => $loginData['user_id'],
+            'otp' => $otp,
+            'email' => $loginData['email'],
+            'phone' => '',
+            'country' => '',
+            'is_verified' => false,
+            'expires_at' => now()->addMinutes(10),
+            'sms_status' => null,
         ]);
 
-        Log::info('Admin phone login OTP resent', [
+        $loginData['otp_id'] = $otpRecord->id;
+        $loginData['access_key_id'] = $accessKey->id;
+        session()->put('admin_email_login', $loginData);
+        session()->put('admin_email_login_last_resent_at', now()->timestamp);
+
+        try {
+            Mail::to($loginData['email'])->send(new AdminOtpEmail($otp, $accessKey->access_key));
+        } catch (\Throwable $exception) {
+            Log::error('Admin email OTP resend failed', [
+                'user_id' => $loginData['user_id'],
+                'email' => $loginData['email'],
+                'error' => $exception->getMessage(),
+            ]);
+            $this->addError('code', __('Unable to send the verification code. Please try again later.'));
+            return;
+        }
+
+        if ($this->showOtpForDebug) {
+            session()->put('admin_email_login_otp_display', $otp);
+        }
+
+        $this->statusEmail = $loginData['email'];
+        $this->statusMessage = __('A new verification code has been sent to :email. Check your inbox and spam folder.', [
+            'email' => $this->statusEmail,
+        ]);
+
+        Log::info('Admin email login OTP resent', [
             'user_id' => $loginData['user_id'],
-            'phone' => $loginData['phone'],
+            'email' => $loginData['email'],
             'otp_id' => $otpRecord->id,
         ]);
     }
 
-    protected function getOrCreateAccessKey(User $user): AdminAccessKey
+    protected function createAccessKey(User $user): AdminAccessKey
     {
-        // Check for an existing active key
-        $existingKey = AdminAccessKey::where('user_id', $user->id)
-            ->where('is_active', true)
-            ->where('expires_at', '>', now())
-            ->first();
+        AdminAccessKey::where('user_id', $user->id)->update(['is_active' => false]);
 
-        if ($existingKey) {
-            return $existingKey;
-        }
-
-        // Generate a new access key (cryptographically secure 48-character token)
         return AdminAccessKey::create([
             'user_id' => $user->id,
             'access_key' => hash('sha256', random_bytes(32)),
@@ -437,17 +291,6 @@ class AdminPhoneLogin extends Component
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
-    }
-
-    protected function formatPhone(?string $phone, ?string $country): string
-    {
-        $callingCode = $this->callingCodes[$country] ?? '';
-
-        if ($callingCode && $phone && ! str_starts_with($phone, $callingCode)) {
-            return $callingCode . ltrim($phone, '+');
-        }
-
-        return $phone ?? '';
     }
 
     public function render()
