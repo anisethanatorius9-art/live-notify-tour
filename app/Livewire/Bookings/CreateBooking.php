@@ -3,9 +3,11 @@
 namespace App\Livewire\Bookings;
 
 use App\Models\Booking;
+use App\Models\Payment;
 use App\Models\Service;
-use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Livewire\Component;
 
 class CreateBooking extends Component
 {
@@ -24,7 +26,7 @@ class CreateBooking extends Component
     public function calculateTotal()
     {
         if ($this->service) {
-            $this->totalPrice = $this->numberOfPeople * $this->service->price;
+            $this->totalPrice = round($this->numberOfPeople * $this->service->price, 2);
         }
     }
 
@@ -49,6 +51,15 @@ class CreateBooking extends Component
             'number_of_people' => $this->numberOfPeople,
             'total_price' => $this->totalPrice,
             'notes' => $this->notes,
+            'status' => 'pending',
+        ]);
+
+        Payment::create([
+            'booking_id' => $booking->id,
+            'user_id' => Auth::id(),
+            'amount' => round($this->totalPrice, 2),
+            'payment_method' => 'manual',
+            'transaction_id' => 'PAY-' . strtoupper(Str::random(6)) . '-' . $booking->id,
             'status' => 'pending',
         ]);
 

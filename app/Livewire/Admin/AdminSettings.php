@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin;
 
-use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Component;
 
 class AdminSettings extends Component
 {
@@ -12,6 +12,8 @@ class AdminSettings extends Component
     public $maxUploadSize = 10;
     public $sessionTimeout = 120;
     public $emailNotifications = true;
+    public $autoApprovePayments = false;
+    public $showAnnouncements = true;
 
     public function mount()
     {
@@ -19,6 +21,8 @@ class AdminSettings extends Component
         $this->maxUploadSize = Cache::get('app.max_upload_size', 10);
         $this->sessionTimeout = Cache::get('app.session_timeout', 120);
         $this->emailNotifications = Cache::get('app.email_notifications', true);
+        $this->autoApprovePayments = Cache::get('app.auto_approve_payments', false);
+        $this->showAnnouncements = Cache::get('app.show_announcements', true);
     }
 
     public function toggleModal()
@@ -32,6 +36,8 @@ class AdminSettings extends Component
         Cache::put('app.max_upload_size', $this->maxUploadSize, 86400 * 365);
         Cache::put('app.session_timeout', $this->sessionTimeout, 86400 * 365);
         Cache::put('app.email_notifications', $this->emailNotifications, 86400 * 365);
+        Cache::put('app.auto_approve_payments', $this->autoApprovePayments, 86400 * 365);
+        Cache::put('app.show_announcements', $this->showAnnouncements, 86400 * 365);
 
         $this->dispatch('notify', message: __('Settings saved successfully'), type: 'success');
         $this->showModal = false;

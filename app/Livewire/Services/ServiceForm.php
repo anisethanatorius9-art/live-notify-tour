@@ -48,13 +48,13 @@ class ServiceForm extends Component
 
         if ($service) {
             $this->service = $service;
-            $this->name = $service->name;
-            $this->description = $service->description;
-            $this->price = $service->price;
+            $this->name = (string) ($service->name ?? '');
+            $this->description = (string) ($service->description ?? '');
+            $this->price = (string) ($service->price ?? '');
             $this->location_id = $service->location_id;
-            $this->category = $service->category;
-            $this->image_url = $service->image_url;
-            $this->status = $service->status;
+            $this->category = (string) ($service->category ?? '');
+            $this->image_url = (string) ($service->image_url ?? '');
+            $this->status = (string) ($service->status ?? 'active');
         }
     }
 

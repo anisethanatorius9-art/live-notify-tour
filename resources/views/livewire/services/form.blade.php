@@ -11,7 +11,7 @@
                             {{ $service ? __('Update service details and pricing.') : __('Add a new service so tourists can book it.') }}
                         </p>
                     </div>
-                    <flux:button href="{{ route('services.index') }}" variant="secondary" wire:navigate>
+                    <flux:button href="{{ route('services.index') }}" variant="outline" wire:navigate>
                         {{ __('Back to services') }}
                     </flux:button>
                 </div>
@@ -102,7 +102,7 @@
                         <flux:button type="submit" variant="primary">
                             {{ $service ? __('Save Service') : __('Create Service') }}
                         </flux:button>
-                        <flux:button type="button" variant="secondary" href="{{ route('services.index') }}" wire:navigate>
+                        <flux:button type="button" variant="outline" href="{{ route('services.index') }}" wire:navigate>
                             {{ __('Cancel') }}
                         </flux:button>
                     </div>

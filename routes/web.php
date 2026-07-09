@@ -9,6 +9,7 @@ use App\Livewire\Dashboard\TouristDashboard;
 use App\Livewire\Dashboard\ProviderDashboard;
 use App\Livewire\Dashboard\AdminDashboard;
 use App\Livewire\HelpPage;
+use App\Livewire\Admin\AdminSettings;
 use App\Livewire\Admin\CategoryManagement;
 use App\Livewire\Admin\LocationManagement;
 use App\Livewire\Admin\UserManagement;
@@ -44,6 +45,7 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/login/google', [SocialAuthController::class, 'redirectToGoogle'])->name('login.google');
     Route::get('/login/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('login.google.callback');
     Route::get('/login/phone', \App\Livewire\Auth\UserPhoneLogin::class)->name('login.phone');
+    Route::get('/login/email', \App\Livewire\Auth\UserEmailLogin::class)->name('login.email');
 });
 
 // Smart Dashboard Route - redirects based on role
@@ -176,6 +178,7 @@ Route::middleware(['auth', 'verified', 'role.check', 'admin.check'])->group(func
         // Services
         Route::name('services.')->group(function () {
             Route::get('/services', \App\Livewire\Services\ServiceIndex::class)->name('index');
+            Route::get('/services/create', \App\Livewire\Services\ServiceForm::class)->name('create');
             Route::get('/services/{service}/edit', \App\Livewire\Services\ServiceForm::class)->name('edit');
         });
 
@@ -190,9 +193,7 @@ Route::middleware(['auth', 'verified', 'role.check', 'admin.check'])->group(func
 
         // Settings
         Route::name('settings.')->group(function () {
-            Route::get('/settings', function () {
-                return view('livewire.settings.index');
-            })->name('index');
+            Route::get('/settings', AdminSettings::class)->name('index');
         });
     });
 });

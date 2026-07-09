@@ -1,17 +1,15 @@
 <x-layouts.app>
-    <div class="min-h-screen bg-gray-50">
-        <!-- Header Section -->
-        <div class="bg-white border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div class="flex items-center justify-between">
+    <div class="min-h-screen bg-gray-50 dark:bg-zinc-950">
+        <div class="border-b border-gray-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+            <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex-1">
-                        <h1 class="text-3xl font-bold text-gray-900">
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                             {{ __('Admin Dashboard') }}
                         </h1>
-                        <p class="text-gray-600 mt-2">{{ __('System overview and management') }}</p>
+                        <p class="mt-2 text-gray-600 dark:text-zinc-400">{{ __('System overview and management') }}</p>
                     </div>
-                    <!-- Help & Settings Buttons -->
-                    <div class="flex items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-3">
                         <livewire:admin.admin-help />
                         <livewire:admin.admin-settings />
                     </div>
@@ -19,15 +17,15 @@
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <!-- Key Metrics -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <flux:card>
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">{{ __('Total Users') }}</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-2">{{ $totalUsers }}</p>
-                            <p class="text-xs text-gray-600 mt-2">
+                            <p class="text-sm text-gray-500 dark:text-zinc-400">{{ __('Total Users') }}</p>
+                            <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ $totalUsers }}</p>
+                            <p class="mt-2 text-xs text-gray-600 dark:text-zinc-400">
                                 Tourists: {{ $totalTourists }} | Providers: {{ $totalProviders }}
                             </p>
                         </div>
@@ -37,9 +35,9 @@
                 <flux:card>
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">{{ __('Total Services') }}</p>
-                            <p class="text-3xl font-bold text-blue-600 mt-2">{{ $totalServices }}</p>
-                            <p class="text-xs text-gray-600 mt-2">{{ __('Active across platform') }}</p>
+                            <p class="text-sm text-gray-500 dark:text-zinc-400">{{ __('Total Services') }}</p>
+                            <p class="mt-2 text-3xl font-bold text-blue-600">{{ $totalServices }}</p>
+                            <p class="mt-2 text-xs text-gray-600 dark:text-zinc-400">{{ __('Active across platform') }}</p>
                         </div>
                     </div>
                 </flux:card>
@@ -47,9 +45,9 @@
                 <flux:card>
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">{{ __('Total Bookings') }}</p>
-                            <p class="text-3xl font-bold text-green-600 mt-2">{{ $totalBookings }}</p>
-                            <p class="text-xs text-gray-600 mt-2">
+                            <p class="text-sm text-gray-500 dark:text-zinc-400">{{ __('Total Bookings') }}</p>
+                            <p class="mt-2 text-3xl font-bold text-green-600">{{ $totalBookings }}</p>
+                            <p class="mt-2 text-xs text-gray-600 dark:text-zinc-400">
                                 Completed: {{ $completedBookings }} | Pending: {{ $pendingBookings }}
                             </p>
                         </div>
@@ -59,11 +57,11 @@
                 <flux:card>
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">{{ __('Total Revenue') }}</p>
-                            <p class="text-3xl font-bold text-yellow-600 mt-2">
+                            <p class="text-sm text-gray-500 dark:text-zinc-400">{{ __('Total Revenue') }}</p>
+                            <p class="mt-2 text-3xl font-bold text-yellow-600">
                                 {{ number_format($totalRevenue, 2) }}
                             </p>
-                            <p class="text-xs text-gray-600 mt-2">{{ __('From completed bookings') }}</p>
+                            <p class="mt-2 text-xs text-gray-600 dark:text-zinc-400">{{ __('From completed bookings') }}</p>
                         </div>
                     </div>
                 </flux:card>
@@ -75,7 +73,7 @@
                     <!-- Users Management -->
                     <flux:card>
                         <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900">{{ __('Users Management') }}</h2>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('Users Management') }}</h2>
                             <flux:link :href="route('admin.users.create')" wire:navigate class="text-blue-600">
                                 {{ __('Add User') }}
                             </flux:link>
@@ -156,7 +154,7 @@
                             {{ $users->links() }}
                         </div>
                         @else
-                        <div class="text-center py-12 text-gray-500">
+                        <div class="py-12 text-center text-gray-500 dark:text-zinc-400">
                             <p>{{ __('No users found') }}</p>
                         </div>
                         @endif
@@ -166,7 +164,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Recent Services -->
                         <flux:card>
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('Recent Services') }}</h3>
+                            <h3 class="mb-4 text-lg font-bold text-gray-900 dark:text-white">{{ __('Recent Services') }}</h3>
                             <div class="space-y-3 max-h-96 overflow-y-auto">
                                 @forelse($recentServices as $service)
                                 <div class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
@@ -184,7 +182,7 @@
 
                         <!-- Recent Payments -->
                         <flux:card>
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('Recent Payments') }}</h3>
+                            <h3 class="mb-4 text-lg font-bold text-gray-900 dark:text-white">{{ __('Recent Payments') }}</h3>
                             <div class="space-y-3 max-h-96 overflow-y-auto">
                                 @forelse($recentPayments as $payment)
                                 <div class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
@@ -218,7 +216,7 @@
                 <div class="space-y-6">
                     <!-- System Health -->
                     <flux:card>
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('System Health') }}</h3>
+                        <h3 class="mb-4 text-lg font-bold text-gray-900 dark:text-white">{{ __('System Health') }}</h3>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm text-gray-600">{{ __('Database') }}</span>
@@ -237,7 +235,7 @@
 
                     <!-- Quick Links -->
                     <flux:card>
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('Quick Links') }}</h3>
+                        <h3 class="mb-4 text-lg font-bold text-gray-900 dark:text-white">{{ __('Quick Links') }}</h3>
                         <div class="space-y-2">
                             <flux:link :href="route('admin.locations.index')" wire:navigate class="block text-blue-600 hover:underline">
                                 {{ __('Manage Locations') }}

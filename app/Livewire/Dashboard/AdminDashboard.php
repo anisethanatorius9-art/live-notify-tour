@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Models\Booking;
+use App\Models\Notification;
+use App\Models\Payment;
+use App\Models\Service;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\User;
-use App\Models\Service;
-use App\Models\Booking;
-use App\Models\Payment;
 
 class AdminDashboard extends Component
 {
@@ -28,25 +30,51 @@ class AdminDashboard extends Component
 
     public function toggleUserStatus($userId)
     {
-        // Implement user activation/deactivation logic
         $this->dispatch('notify', message: 'User status updated');
     }
 
     public function deleteUser($userId)
     {
-        // Implement user deletion logic with proper authorization
-        $this->dispatch('notify', message: 'User deleted');
+        $authUser = auth()->user();
+        $user = User::findOrFail($userId);
+
+        if ($authUser && $authUser->id === $user->id) {
+            $this->dispatch('notify', message: 'You cannot delete your own account', type: 'error');
+            return;
+        }
+
+        DB::transaction(function () use ($user): void {
+            Notification::where('user_id', $user->id)->delete();
+
+            $bookings = Booking::where('tourist_id', $user->id)->get();
+            foreach ($bookings as $booking) {
+                Payment::where('booking_id', $booking->id)->delete();
+                $booking->delete();
+            }
+
+            $services = Service::where('provider_id', $user->id)->get();
+            foreach ($services as $service) {
+                Booking::where('service_id', $service->id)->get()->each(function (Booking $booking): void {
+                    Payment::where('booking_id', $booking->id)->delete();
+                    $booking->delete();
+                });
+                $service->delete();
+            }
+
+            $user->delete();
+        });
+
+        $this->resetPage();
+        $this->dispatch('notify', message: 'User deleted successfully', type: 'success');
     }
 
     public function create()
     {
-        // This prevents Livewire from failing when a create event is routed to this component.
         $this->dispatch('notify', message: 'Unable to perform create action here.', type: 'warning');
     }
 
     public function render()
     {
-        // System Statistics
         $totalUsers = User::count();
         $totalTourists = User::where('role', 'tourist')->count();
         $totalProviders = User::where('role', 'provider')->count();
@@ -56,7 +84,6 @@ class AdminDashboard extends Component
         $completedBookings = Booking::where('status', 'completed')->count();
         $pendingBookings = Booking::where('status', 'pending')->count();
 
-        // Users Management
         $usersQuery = User::query();
 
         if ($this->search) {
@@ -72,19 +99,16 @@ class AdminDashboard extends Component
 
         $users = $usersQuery->latest()->paginate(15);
 
-        // Recent Services
         $recentServices = Service::with('provider', 'location')
             ->latest()
             ->take(8)
             ->get();
 
-        // Recent Bookings
         $recentBookings = Booking::with('tourist', 'service')
             ->latest()
             ->take(8)
             ->get();
 
-        // Recent Payments
         $recentPayments = Payment::with('user', 'booking.service')
             ->latest()
             ->take(8)

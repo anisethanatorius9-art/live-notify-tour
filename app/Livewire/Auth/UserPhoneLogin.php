@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Auth;
 
+use App\Models\PhoneVerificationOtp;
 use App\Models\User;
+use App\Services\SmsService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -63,22 +65,52 @@ class UserPhoneLogin extends Component
             return;
         }
 
-        $otp = (string) random_int(100000, 999999);
+        $otp = PhoneVerificationOtp::generateUniqueOtp();
+        $formattedPhone = $this->formatPhone($this->phone, $this->country);
+
+        // Create OTP record in database
+        $otpRecord = PhoneVerificationOtp::create([
+            'user_id' => $user->id,
+            'otp' => $otp,
+            'email' => '',
+            'phone' => $this->phone,
+            'country' => $this->country,
+            'is_verified' => false,
+            'expires_at' => now()->addMinutes(10),
+            'attempt_count' => 0,
+            'last_attempt_at' => null,
+            'sms_status' => 'pending',
+            'sms_response' => null,
+        ]);
+
+        // Attempt to send SMS
+        $smsSent = SmsService::sendOtp($formattedPhone, $otp, $this->country);
+
+        if (! $smsSent) {
+            // Update OTP record with failed status
+            $otpRecord->update(['sms_status' => 'failed']);
+            $this->addError('phone', __('Unable to send the verification code. Please try again later.'));
+            return;
+        }
+
+        // Update OTP record with sent status
+        $otpRecord->update(['sms_status' => 'sent']);
+
+        // Store session data
         session()->put('user_phone_login', [
             'user_id' => $user->id,
             'phone' => $this->phone,
             'country' => $this->country,
+            'otp_id' => $otpRecord->id,
         ]);
-        session()->put('user_phone_login_otp', $otp);
-        session()->put('user_phone_login_otp_expires_at', now()->addMinutes(10)->timestamp);
 
-        $this->formattedPhone = $this->formatPhone($this->phone, $this->country);
+        $this->formattedPhone = $formattedPhone;
         $this->statusMessage = __('A verification code has been sent via SMS to :phone.', ['phone' => $this->formattedPhone]);
 
-        Log::info('User phone login OTP sent', [
+        Log::info('User phone login OTP sent via SMS', [
             'user_id' => $user->id,
             'phone' => $this->phone,
-            'code' => $otp,
+            'otp_id' => $otpRecord->id,
         ]);
     }
 
@@ -89,38 +121,48 @@ class UserPhoneLogin extends Component
         ]);
 
         $loginData = session('user_phone_login');
-        $otp = session('user_phone_login_otp');
-        $expiresAt = session('user_phone_login_otp_expires_at');
-
         if (! $loginData) {
             $this->addError('code', 'Session expired. Please request a new code.');
             return;
         }
 
-        if (! $otp || $otp !== $this->code) {
-            $this->addError('code', 'The verification code is invalid.');
+        $otpRecord = PhoneVerificationOtp::find($loginData['otp_id'] ?? null);
+        if (! $otpRecord) {
+            $this->addError('code', 'The verification code is invalid or expired.');
             return;
         }
 
-        if ($expiresAt && now()->timestamp > $expiresAt) {
+        $otpRecord->recordAttempt();
+
+        if ($otpRecord->hasTooManyAttempts()) {
+            $this->addError('code', 'Too many failed attempts. Please request a new code.');
+            return;
+        }
+
+        if ($otpRecord->hasExpired()) {
             $this->addError('code', 'The verification code has expired. Please request a new code.');
             return;
         }
 
-        $user = User::find($loginData['user_id']);
+        if ($otpRecord->otp !== $this->code) {
+            $this->addError('code', 'The verification code is incorrect. Please try again.');
+            return;
+        }
 
+        $user = User::find($loginData['user_id']);
         if (! $user) {
             $this->addError('code', 'User not found.');
             return;
         }
+
+        $otpRecord->markAsVerified();
 
         Auth::login($user);
 
         // Clean up session data
         session()->forget([
             'user_phone_login',
-            'user_phone_login_otp',
-            'user_phone_login_otp_expires_at',
+            'user_phone_login_last_resent_at',
         ]);
 
         session()->regenerate();
@@ -140,24 +182,60 @@ class UserPhoneLogin extends Component
         // Rate limiting
         $lastResentAt = session('user_phone_login_last_resent_at');
         if ($lastResentAt && now()->timestamp - $lastResentAt < 60) {
-            $this->statusMessage = 'Please wait before requesting a new code.';
+            $this->statusMessage = __('Please wait 60 seconds before requesting a new code.');
             return;
         }
 
-        $otp = (string) random_int(100000, 999999);
-        session()->put('user_phone_login_otp', $otp);
-        session()->put('user_phone_login_otp_expires_at', now()->addMinutes(10)->timestamp);
-        session()->put('user_phone_login_last_resent_at', now()->timestamp);
+        $otp = PhoneVerificationOtp::generateUniqueOtp();
+        $user = User::find($loginData['user_id']);
+
+        if (! $user) {
+            $this->addError('code', 'User not found.');
+            return;
+        }
+
+        // Create new OTP record
+        $otpRecord = PhoneVerificationOtp::create([
+            'user_id' => $user->id,
+            'otp' => $otp,
+            'email' => '',
+            'phone' => $loginData['phone'],
+            'country' => $loginData['country'],
+            'is_verified' => false,
+            'expires_at' => now()->addMinutes(10),
+            'attempt_count' => 0,
+            'last_attempt_at' => null,
+            'sms_status' => 'pending',
+            'sms_response' => null,
+        ]);
 
         $this->formattedPhone = $this->formatPhone($loginData['phone'], $loginData['country']);
+
+        // Attempt to send SMS
+        $smsSent = SmsService::sendOtp($this->formattedPhone, $otp, $loginData['country']);
+
+        if (! $smsSent) {
+            $otpRecord->update(['sms_status' => 'failed']);
+            $this->addError('code', __('Unable to send the verification code. Please try again later.'));
+            return;
+        }
+
+        // Update OTP record with sent status
+        $otpRecord->update(['sms_status' => 'sent']);
+
+        // Update session with new OTP ID
+        $loginData['otp_id'] = $otpRecord->id;
+        session()->put('user_phone_login', $loginData);
+        session()->put('user_phone_login_last_resent_at', now()->timestamp);
+
         $this->statusMessage = __('A new verification code has been sent via SMS to :phone.', [
             'phone' => $this->formattedPhone,
         ]);
 
-        Log::info('User phone login OTP resent', [
+        Log::info('User phone login OTP resent via SMS', [
             'user_id' => $loginData['user_id'],
             'phone' => $loginData['phone'],
-            'code' => $otp,
+            'otp_id' => $otpRecord->id,
         ]);
     }
 

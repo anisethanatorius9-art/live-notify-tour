@@ -73,12 +73,11 @@
             </a>
         </div>
 
-        <!-- Phone Login -->
+        <!-- Email OTP Login -->
         <div class="w-full mt-3">
-            <a href="{{ route('login.phone') }}">
-                <flux:button variant="outline" type="button" class="w-full items-center">
-                    <flux:icon.phone class="mr-2 h-5 w-5" />
-                    {{ __('Login with Phone Number') }}
+            <a href="{{ route('login.email') }}">
+                <flux:button variant="outline" type="button" class="w-full">
+                    {{ __('Login with Email OTP') }}
                 </flux:button>
             </a>
         </div>
