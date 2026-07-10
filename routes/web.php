@@ -25,6 +25,17 @@ use App\Models\Booking;
 use App\Models\User;
 use App\Models\Location;
 use App\Models\Service;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/safi-cache-kabisa', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    Artisan::call('optimize:clear');
+
+    return "All caches have been fully cleared!";
+});
 
 Route::get('/', function () {
     return view('welcome');
@@ -61,7 +72,7 @@ Route::middleware(['auth', 'verified', 'role.check'])->group(function () {
         $query = request()->query();
 
         // Otherwise redirect to role-specific dashboard with query string preserved
-        return match($user->role) {
+        return match ($user->role) {
             'tourist' => redirect()->route('dashboard.tourist', $query),
             'provider' => redirect()->route('dashboard.provider', $query),
             'admin' => redirect()->route('dashboard.admin', $query),
@@ -138,8 +149,8 @@ Route::middleware(['auth', 'verified', 'role.check', 'role:provider'])->group(fu
     Route::get('/dashboard/provider', ProviderDashboard::class)->name('dashboard.provider');
     Route::name('services.')->group(function () {
         Route::get('/services', \App\Livewire\Services\ServiceIndex::class)->name('index');
-            Route::get('/services/create', \App\Livewire\Services\ServiceForm::class)->name('create');
-            Route::get('/services/{service}/edit', \App\Livewire\Services\ServiceForm::class)->name('edit');
+        Route::get('/services/create', \App\Livewire\Services\ServiceForm::class)->name('create');
+        Route::get('/services/{service}/edit', \App\Livewire\Services\ServiceForm::class)->name('edit');
     });
 });
 
