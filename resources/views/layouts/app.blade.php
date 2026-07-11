@@ -10,6 +10,7 @@
     <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
     <link rel="shortcut icon" href="/favicon.svg?v=3" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/favicon.svg?v=3">
+    <meta name="google-site-verification" content="6oNiMI3leZqDcDNncGB-wJ8K5wQ62vr94OBrrnUYpFQ" />
 
     @fluxAppearance
 
