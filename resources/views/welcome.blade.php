@@ -6,10 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LTN - Live & Notify Tourism</title>
 
+    <meta name="google-site-verification" content="6oNiMI3leZqDcDNncGB-wJ8K5wQ62vr94OBrrnUYpFQ" />
+
     <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
     <link rel="shortcut icon" href="/favicon.svg?v=3" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="preload" as="style" href="https://live-notify-tour.onrender.com/build/assets/app-CM2xrvIu.css" />
+    <link rel="modulepreload" as="script" href="https://live-notify-tour.onrender.com/build/assets/app-34mOoJaZ.js" />
+    <link rel="stylesheet" href="https://live-notify-tour.onrender.com/build/assets/app-CM2xrvIu.css" data-navigate-track="reload" />
+    <script type="module" src="https://live-notify-tour.onrender.com/build/assets/app-34mOoJaZ.js" data-navigate-track="reload"></script>
     <style>
         * {
             margin: 0;
@@ -58,9 +63,7 @@
         .text-gradient {
             background: linear-gradient(to right, #60a5fa, #93c5fd, #ffffff);
             -webkit-background-clip: text;
-            /* Safari/Chrome */
             background-clip: text;
-            /* Standard property - Hapa ndipo palikuwa na error */
             -webkit-text-fill-color: transparent;
         }
 
@@ -81,7 +84,6 @@
             gap: 12px;
             text-decoration: none;
             margin: 10px;
-            /* Hii inazuia buttons kubanana */
         }
 
         .btn-primary-glow {
@@ -136,34 +138,25 @@
 
 <body>
     <div class="relative min-h-screen">
-
-
         <div class="hero-slider">
-
             <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1546182990-dffeafbe841d?q=80&w=2000')"></div>
-
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2000')"></div>
-
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2000')"></div>
-
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?q=80&w=2000')"></div>
         </div>
-
         <div class="hero-overlay"></div>
 
-        <!-- Navbar -->
         <nav class="relative z-50 px-10 py-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <img src="/logo.svg" alt="LTN" class="w-10 h-10">
                 <span class="text-xl font-bold tracking-widest">LTN</span>
             </div>
             <div class="hidden md:flex gap-8">
-                <a href="{{ route('login') }}" class="hover:text-blue-400 transition">Sign In</a>
-                <a href="{{ route('register') }}" class="bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition">Join Now</a>
+                <a href="https://live-notify-tour.onrender.com/login" class="hover:text-blue-400 transition">Sign In</a>
+                <a href="https://live-notify-tour.onrender.com/register" class="bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition">Join Now</a>
             </div>
         </nav>
 
-        <!-- Hero Section -->
         <main class="hero-content text-center px-6">
             <div class="max-w-4xl mx-auto">
                 <div class="reveal active mb-4">
@@ -171,37 +164,29 @@
                         Experience Tanzania
                     </span>
                 </div>
-
                 <h1 class="reveal active text-5xl md:text-8xl font-bold mb-8" style="font-family: 'Playfair Display', serif; transition-delay: 0.2s">
                     Discover the <br> <span class="text-gradient">Untamed Beauty</span>
                 </h1>
-
                 <p class="reveal active text-lg md:text-xl text-white/80 mb-12 max-w-2xl mx-auto leading-relaxed" style="transition-delay: 0.4s">
-                    Real-time updates on Tanzania's wildlife, luxury stays, and authentic flavors.
-                    Your ultimate safari guide starts here.
+                    Real-time updates on Tanzania's wildlife, luxury stays, and authentic flavors. Your ultimate safari guide starts here.
                 </p>
-
-
                 <div class="reveal active" style="transition-delay: 0.6s">
-                    <a href="{{ route('register') }}" class="btn-modern btn-primary-glow">
+                    <a href="https://live-notify-tour.onrender.com/register" class="btn-modern btn-primary-glow">
                         Get Started
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     </a>
-
-                    <a href="{{ route('login') }}" class="btn-modern btn-outline-glass">
+                    <a href="https://live-notify-tour.onrender.com/login" class="btn-modern btn-outline-glass">
                         Member Login
                     </a>
-
-                    <a href="{{ route('admin.login') }}" class="admin-link">
+                    <a href="https://live-notify-tour.onrender.com/admin/login" class="admin-link">
                         Admin Portal →
                     </a>
                 </div>
             </div>
         </main>
     </div>
-
     <script>
         // Slider Logic
         const slides = document.querySelectorAll('.slide');
@@ -212,7 +197,7 @@
             current = (current + 1) % slides.length;
             slides[current].classList.add('active');
         }
-        setInterval(nextSlide, 6000); // Badilisha kila sekunde 6
+        setInterval(nextSlide, 6000);
 
         // Reveal effect on load
         window.addEventListener('load', () => {
