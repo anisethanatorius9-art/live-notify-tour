@@ -27,6 +27,12 @@ use App\Models\Location;
 use App\Models\Service;
 use Illuminate\Support\Facades\Artisan;
 
+Route::get('/sitemap.xml', function () {
+    return response()->file(public_path('sitemap.xml'), [
+        'Content-Type' => 'application/xml',
+    ]);
+});
+
 Route::get('/safi-cache-kabisa', function () {
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
