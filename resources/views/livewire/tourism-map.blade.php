@@ -17,94 +17,90 @@
                     class="tourism-map-location">
                     <div class="flex flex-col">
                         <span class="font-semibold text-zinc-800 dark:text-zinc-200">{{ $location['name'] }}</span>
-                        <span class="text-xs text-zinc-500">{{ $location['description'] }}</span>
-                    </div>
-                </flux:navlist.item>
-                @endforeach
-            </flux:navlist>
-        </div>
+                            <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $location['description'] }}</span>
+                        </div>
+                    </flux:navlist.item>
+                    @endforeach
+                </flux:navlist>
+            </div>
 
-        <div class="md:col-span-2">
-            <div wire:ignore class="rounded-2xl shadow-md border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                <div id="map" style="height: 450px; width: 100%;"></div>
+            <div class="md:col-span-2">
+                <div wire:ignore class="rounded-2xl shadow-md border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                    <div id="map" style="height: 450px; width: 100%;"></div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script id="tourism-map-data" type="application/json">
-        {!! json_encode($locations, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
-    </script>
+        <script id="tourism-map-data" type="application/json">
+            {!! json_encode($locations, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
+        </script>
 
-    <script>
-        let map;
-        let markers = [];
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-o9N1j7k5kG1hVbXkY1Kv3j2UHDa3Q6zVbLkIn1R8MUE=" crossorigin="" />
 
-        function initMap() {
-            const tanzaniaCenter = {
-                lat: -6.369028,
-                lng: 34.888822
-            };
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-o3ep17q3u7V4Xz2zH8BlGCJW+7UPv36nUv97Hi3uw5w=" crossorigin=""></script>
 
-            map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 6,
-                center: tanzaniaCenter,
-                styles: [{
-                    featureType: "poi",
-                    elementType: "labels",
-                    stylers: [{
-                        visibility: "off"
-                    }]
-                }]
-            });
+        <script>
+            let map;
+            let markers = [];
 
-            const locations = JSON.parse(document.getElementById('tourism-map-data').textContent);
+            function initMap() {
+                const tanzaniaCenter = [-6.369028, 34.888822];
+                const mapContainer = document.getElementById('map');
 
-            locations.forEach(location => {
-                const marker = new google.maps.Marker({
-                    position: {
-                        lat: location.lat,
-                        lng: location.lng
-                    },
-                    map: map,
-                    title: location.name,
-                    animation: google.maps.Animation.DROP
+                if (!mapContainer || typeof L === 'undefined') {
+                    console.error('Leaflet library not loaded or map container missing.');
+                    return;
+                }
+
+                map = L.map(mapContainer, {
+                    center: tanzaniaCenter,
+                    zoom: 6,
+                    zoomControl: true,
+                    scrollWheelZoom: false,
                 });
 
-                const infowindow = new google.maps.InfoWindow({
-                    content: `<div style="color: black; padding: 4px;"><strong>${location.name}</strong><p style="margin-top: 4px; font-size: 13px;">${location.description}</p></div>`
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 18,
+                }).addTo(map);
+
+                const locations = JSON.parse(document.getElementById('tourism-map-data').textContent);
+
+                locations.forEach(location => {
+                    const marker = L.marker([location.lat, location.lng]).addTo(map);
+                    marker.bindPopup(`<strong>${location.name}</strong><br>${location.description}`);
+                    markers.push(marker);
                 });
 
-                marker.addListener("click", () => {
-                    infowindow.open(map, marker);
+                document.querySelectorAll('.tourism-map-location').forEach(item => {
+                    item.addEventListener('click', event => {
+                        event.preventDefault();
+                        const lat = parseFloat(item.dataset.lat);
+                        const lng = parseFloat(item.dataset.lng);
+
+                        if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+                            focusLocation(lat, lng);
+                        }
+                    });
                 });
-
-                markers.push(marker);
-            });
-
-            document.querySelectorAll('.tourism-map-location').forEach(item => {
-                item.addEventListener('click', event => {
-                    event.preventDefault();
-                    const lat = parseFloat(item.dataset.lat);
-                    const lng = parseFloat(item.dataset.lng);
-
-                    if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-                        focusLocation(lat, lng);
-                    }
-                });
-            });
-        }
-
-        function focusLocation(lat, lng) {
-            if (!map) {
-                return;
             }
-            map.setCenter({
-                lat: lat,
-                lng: lng
-            });
-            map.setZoom(10);
-        }
-    </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap" async defer></script>
-</div>
+            function focusLocation(lat, lng) {
+                if (!map) {
+                    return;
+                }
+
+                map.flyTo([lat, lng], 10, {
+                    duration: 0.8
+                });
+            }
+
+            window.addEventListener('load', initMap);
+            window.addEventListener('resize', function () {
+                if (map) {
+                    map.invalidateSize();
+                }
+            });
+        </script>
