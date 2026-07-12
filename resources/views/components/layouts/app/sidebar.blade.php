@@ -81,6 +81,14 @@
                     </flux:sidebar.item>
 
                     <flux:sidebar.item
+                        icon="globe-alt"
+                        href="{{ route('tourism.map') }}"
+                        :current="request()->routeIs('tourism.map')"
+                        class="rounded-lg">
+                        Tourism Map
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item
                         icon="tag"
                         href="{{ route('categories.index') }}"
                         :current="request()->routeIs('categories.*')"

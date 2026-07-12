@@ -11,25 +11,26 @@
     <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
     <link rel="shortcut icon" href="/favicon.svg?v=3" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="preload" as="style" href="https://live-notify-tour.onrender.com/build/assets/app-CM2xrvIu.css" />
-    <link rel="modulepreload" as="script" href="https://live-notify-tour.onrender.com/build/assets/app-34mOoJaZ.js" />
-    <link rel="stylesheet" href="https://live-notify-tour.onrender.com/build/assets/app-CM2xrvIu.css" data-navigate-track="reload" />
-    <script type="module" src="https://live-notify-tour.onrender.com/build/assets/app-34mOoJaZ.js" data-navigate-track="reload"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        * {
+        html,
+        body {
             margin: 0;
             padding: 0;
+            min-height: 100%;
             box-sizing: border-box;
-        }
-
-        body {
             font-family: 'Poppins', sans-serif;
             background-color: #020617;
             color: #ffffff;
             overflow-x: hidden;
         }
 
-        /* Background Image Slider */
+        *,
+        *::before,
+        *::after {
+            box-sizing: inherit;
+        }
+
         .hero-slider {
             position: absolute;
             inset: 0;
@@ -43,8 +44,8 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
-            transform: scale(1.1);
-            transition: opacity 2s ease-in-out, transform 8s linear;
+            transform: scale(1.08);
+            transition: opacity 1.6s ease-in-out, transform 8s linear;
         }
 
         .slide.active {
@@ -55,83 +56,120 @@
         .hero-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.8));
+            background: linear-gradient(180deg, rgba(2, 6, 23, 0.25), rgba(2, 6, 23, 0.88));
             z-index: 0;
         }
 
-        /* FIX KWA ILE ERROR YAKO YA CSS */
         .text-gradient {
-            background: linear-gradient(to right, #60a5fa, #93c5fd, #ffffff);
+            background: linear-gradient(90deg, #60a5fa, #93c5fd, #ffffff);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* Buttons & Spacing */
         .hero-content {
             position: relative;
             z-index: 10;
-            padding-top: 120px;
+            padding: 120px 24px 100px;
+            max-width: 980px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            margin-bottom: 1.5rem;
+            line-height: 1.05;
+        }
+
+        .hero-content p {
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.05rem;
+            max-width: 42rem;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .cta-group {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
         }
 
         .btn-modern {
-            padding: 1.2rem 2.5rem;
-            border-radius: 50px;
+            padding: 1rem 2rem;
+            border-radius: 999px;
             font-weight: 600;
-            transition: all 0.4s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             text-decoration: none;
-            margin: 10px;
+            margin: 0;
+            min-height: 48px;
         }
 
         .btn-primary-glow {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 16px 30px rgba(59, 130, 246, 0.28);
         }
 
         .btn-primary-glow:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.32);
         }
 
         .btn-outline-glass {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            backdrop-filter: blur(12px);
             color: white;
         }
 
         .btn-outline-glass:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: white;
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
         .admin-link {
-            display: block;
-            margin-top: 30px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 1.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
             text-decoration: none;
-            transition: 0.3s;
+            transition: color 0.25s ease;
         }
 
         .admin-link:hover {
             color: #60a5fa;
         }
 
-        /* Animations */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
-            transition: 1s ease-out;
+            transform: translateY(24px);
+            transition: opacity 0.9s ease-out, transform 0.9s ease-out;
         }
 
         .reveal.active {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                padding-top: 100px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>

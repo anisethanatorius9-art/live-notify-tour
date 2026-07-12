@@ -73,14 +73,14 @@ $user = $user ?? auth()->user();
             </flux:sidebar.item>
 
             <flux:sidebar.item
-                        icon="globe-alt"
-                        href="{{ route('tourism.map') }}"
-                        :current="request()->routeIs('tourism.map')"
-                        class="rounded-lg">
-                        Tourism Map
-                    </flux:sidebar.item>
+                icon="globe-alt"
+                href="{{ route('tourism.map') }}"
+                :current="request()->routeIs('tourism.map')"
+                class="rounded-lg">
+                Tourism Map
+            </flux:sidebar.item>
 
-                    <flux:sidebar.item
+            <flux:sidebar.item
                 badge="{{ $user?->notifications()?->count() ?? 0 }}"
                 href="{{ route('notifications.index') }}"
                 :current="request()->routeIs('notifications.*')"
