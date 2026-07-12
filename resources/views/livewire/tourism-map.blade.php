@@ -35,11 +35,9 @@
             {!! json_encode($locations, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
         </script>
 
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-            integrity="sha256-o9N1j7k5kG1hVbXkY1Kv3j2UHDa3Q6zVbLkIn1R8MUE=" crossorigin="" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-o3ep17q3u7V4Xz2zH8BlGCJW+7UPv36nUv97Hi3uw5w=" crossorigin=""></script>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
         <script>
             let map;
