@@ -61,6 +61,7 @@ Route::middleware(['guest'])->group(function () {
     // User login routes
     Route::get('/login/google', [SocialAuthController::class, 'redirectToGoogle'])->name('login.google');
     Route::get('/login/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('login.google.callback');
+    Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
     Route::get('/login/phone', \App\Livewire\Auth\UserPhoneLogin::class)->name('login.phone');
     Route::get('/login/email', \App\Livewire\Auth\UserEmailLogin::class)->name('login.email');
 });
