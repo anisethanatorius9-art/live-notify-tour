@@ -250,4 +250,6 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    Route::get('/map', \App\Livewire\TourismMap::class)->name('tourism.map');
 });
