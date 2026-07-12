@@ -31,12 +31,14 @@
             box-sizing: inherit;
         }
 
-        .hero-slider {
+
+        .hero-container {
             position: absolute;
             inset: 0;
             z-index: -1;
             overflow: hidden;
         }
+
 
         .slide {
             position: absolute;
@@ -44,14 +46,37 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
-            transform: scale(1.08);
-            transition: opacity 1.6s ease-in-out, transform 8s linear;
+            transition: opacity 2s ease-in-out, transform 0.1s linear;
+            /* Fast transform for scroll */
+            transform-origin: center;
         }
 
         .slide.active {
             opacity: 1;
-            transform: scale(1);
+            /* Auto-movement on active slide (like a gentle Ken Burns effect) */
+            animation: slowMove 8s linear infinite alternate;
         }
+
+
+        @keyframes slowMove {
+            from {
+                transform: scale(1.05) translate(-10px, -5px);
+            }
+
+            to {
+                transform: scale(1.02) translate(10px, 5px);
+            }
+        }
+
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            /* SASA: Start lower */
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+            /* SASA: Slower release */
+        }
+
 
         .hero-overlay {
             position: absolute;
@@ -147,12 +172,6 @@
             color: #60a5fa;
         }
 
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.9s ease-out, transform 0.9s ease-out;
-        }
-
         .reveal.active {
             opacity: 1;
             transform: translateY(0);
@@ -176,7 +195,7 @@
 
 <body>
     <div class="relative min-h-screen">
-        <div class="hero-slider">
+        <div class="hero-container">
             <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1546182990-dffeafbe841d?q=80&w=2000')"></div>
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2000')"></div>
             <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2000')"></div>
@@ -197,19 +216,15 @@
 
         <main class="hero-content text-center px-6">
             <div class="max-w-4xl mx-auto">
-                <div class="reveal active mb-4">
-                    <span class="px-4 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold uppercase tracking-widest">
+                <div class="reveal mb-4"> <span class="px-4 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold uppercase tracking-widest">
                         Experience Tanzania
                     </span>
                 </div>
-                <h1 class="reveal active text-5xl md:text-8xl font-bold mb-8" style="font-family: 'Playfair Display', serif; transition-delay: 0.2s">
-                    Discover the <br> <span class="text-gradient">Untamed Beauty</span>
+                <h1 class="reveal text-5xl md:text-8xl font-bold mb-8" style="font-family: 'Playfair Display', serif; transition-delay: 0.2s"> Discover the <br> <span class="text-gradient">Untamed Beauty</span>
                 </h1>
-                <p class="reveal active text-lg md:text-xl text-white/80 mb-12 max-w-2xl mx-auto leading-relaxed" style="transition-delay: 0.4s">
-                    Real-time updates on Tanzania's wildlife, luxury stays, and authentic flavors. Your ultimate safari guide starts here.
+                <p class="reveal text-lg md:text-xl text-white/80 mb-12 max-w-2xl mx-auto leading-relaxed" style="transition-delay: 0.4s"> Real-time updates on Tanzania's wildlife, luxury stays, and authentic flavors. Your ultimate safari guide starts here.
                 </p>
-                <div class="reveal active" style="transition-delay: 0.6s">
-                    <a href="https://live-notify-tour.onrender.com/register" class="btn-modern btn-primary-glow">
+                <div class="reveal" style="transition-delay: 0.6s"> <a href="https://live-notify-tour.onrender.com/register" class="btn-modern btn-primary-glow">
                         Get Started
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -226,8 +241,18 @@
         </main>
     </div>
     <script>
-        // Slider Logic
         const slides = document.querySelectorAll('.slide');
+
+        window.addEventListener('scroll', () => {
+            const scrollPos = window.pageYOffset;
+            const scrollSpeed = 0.5; // Change this for parallax strength
+
+            slides.forEach(slide => {
+                slide.style.transform = `translateY(${scrollPos * scrollSpeed}px)`;
+            });
+        });
+
+
         let current = 0;
 
         function nextSlide() {
@@ -235,11 +260,13 @@
             current = (current + 1) % slides.length;
             slides[current].classList.add('active');
         }
-        setInterval(nextSlide, 6000);
+        setInterval(nextSlide, 7000); // SASA: Slightly slower cycle for realism
 
-        // Reveal effect on load
+
         window.addEventListener('load', () => {
-            document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+            setTimeout(() => { // SASA: Small delay before release starts
+                document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+            }, 150);
         });
     </script>
 </body>
