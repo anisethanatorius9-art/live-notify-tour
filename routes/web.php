@@ -233,6 +233,8 @@ Route::middleware(['auth', 'verified', 'role.check'])->group(function () {
     })->name('bookings.show');
 });
 
+Route::get('/map', \App\Livewire\TourismMap::class)->name('tourism.map');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
@@ -250,6 +252,4 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
-
-    Route::get('/map', \App\Livewire\TourismMap::class)->name('tourism.map');
 });
