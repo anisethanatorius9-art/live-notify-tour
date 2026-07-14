@@ -133,6 +133,7 @@
         let markers = [];
         let routingControl = null;
         let userLocation = null;
+        let tourismLocations = [];
 
         function initMap() {
             const tanzaniaCenter = [-6.369028, 34.888822];
@@ -157,9 +158,9 @@
 
             requestUserLocation();
 
-            const locations = JSON.parse(document.getElementById('tourism-map-data').textContent);
+            tourismLocations = JSON.parse(document.getElementById('tourism-map-data').textContent);
 
-            locations.forEach(location => {
+            tourismLocations.forEach(location => {
                 const marker = L.marker([location.lat, location.lng], {
                     icon: L.icon({
                         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
@@ -273,10 +274,41 @@
             });
         }
 
+        function findStoredLocationCoordinates(text) {
+            if (!text) {
+                return null;
+            }
+
+            const query = text.toString().trim().toLowerCase();
+            return tourismLocations.find(location => {
+                const name = location.name.toLowerCase();
+                return name === query || name.includes(query) || query.includes(name);
+            }) || null;
+        }
+
         function geocodeLocation(text) {
             return new Promise((resolve, reject) => {
-                const geocoder = L.Control.Geocoder.nominatim();
+                const directMatch = findStoredLocationCoordinates(text);
+                if (directMatch) {
+                    resolve([directMatch.lat, directMatch.lng]);
+                    return;
+                }
+
+                const geocoder = L.Control.Geocoder && typeof L.Control.Geocoder.nominatim === 'function'
+                    ? L.Control.Geocoder.nominatim()
+                    : null;
+
+                if (!geocoder) {
+                    reject(new Error('Geocoder is unavailable.'));
+                    return;
+                }
+
+                const timeout = setTimeout(() => {
+                    reject(new Error('Location lookup timed out.'));
+                }, 7000);
+
                 geocoder.geocode(text, function(results) {
+                    clearTimeout(timeout);
                     if (!results || results.length === 0) {
                         reject(new Error('Location not found: ' + text));
                         return;
