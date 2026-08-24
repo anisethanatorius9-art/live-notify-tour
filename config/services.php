@@ -41,6 +41,11 @@ return [
          'redirect' => env('GOOGLE_REDIRECT_URI'),
      ],
 
+     'gemini' => [
+         'key' => env('GEMINI_API_KEY'),
+         'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+     ],
+
      'twilio' => [
          'account_sid' => env('TWILIO_ACCOUNT_SID'),
          'auth_token' => env('TWILIO_AUTH_TOKEN'),

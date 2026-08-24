@@ -264,8 +264,7 @@
 
                 navigator.geolocation.getCurrentPosition(
                     position => resolve([position.coords.latitude, position.coords.longitude]),
-                    error => reject(error),
-                    {
+                    error => reject(error), {
                         enableHighAccuracy: true,
                         timeout: 10000,
                         maximumAge: 60000
@@ -294,9 +293,9 @@
                     return;
                 }
 
-                const geocoder = L.Control.Geocoder && typeof L.Control.Geocoder.nominatim === 'function'
-                    ? L.Control.Geocoder.nominatim()
-                    : null;
+                const geocoder = L.Control.Geocoder && typeof L.Control.Geocoder.nominatim === 'function' ?
+                    L.Control.Geocoder.nominatim() :
+                    null;
 
                 if (!geocoder) {
                     reject(new Error('Geocoder is unavailable.'));

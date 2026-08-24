@@ -24,6 +24,8 @@
             </div>
         </div>
 
+        <livewire:help-ai-chat />
+
         <div class="grid md:grid-cols-3 gap-6 mb-10">
             @foreach($categories as $category)
                 <button
