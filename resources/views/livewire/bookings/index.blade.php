@@ -46,22 +46,22 @@
                         <flux:table.row>
                             <flux:table.cell>
                                 <div class="space-y-1">
-                                    <p class="font-semibold text-gray-900 dark:text-white">{{ $booking->service->name }}</p>
+                                    <p class="font-semibold text-gray-900 dark:text-white">{{ $booking->booking_type === 'transport' ? ucfirst(str_replace('_', ' ', $booking->transport_type)) : $booking->service->name }}</p>
                                     <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                                         <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                        <span class="text-sm">{{ $booking->service->location->name }}</span>
+                                        <span class="text-sm">{{ $booking->booking_type === 'transport' ? $booking->origin . ' to ' . $booking->destination : $booking->service->location->name }}</span>
                                     </div>
                                 </div>
                             </flux:table.cell>
                             <flux:table.cell>
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-sm">
-                                        {{ substr($booking->service->provider->name, 0, 1) }}
+                                        {{ $booking->booking_type === 'transport' ? 'L' : substr($booking->service->provider->name, 0, 1) }}
                                     </div>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ $booking->service->provider->name }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ $booking->booking_type === 'transport' ? 'LNT Transport' : $booking->service->provider->name }}</span>
                                 </div>
                             </flux:table.cell>
                             <flux:table.cell>

@@ -11,6 +11,31 @@
                 </a>
             </div>
 
+            @if($booking->booking_type === 'transport')
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div class="xl:col-span-2 space-y-6">
+                    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ ucfirst(str_replace('_', ' ', $booking->transport_type)) }}</h2>
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Your transport booking from {{ $booking->origin }} to {{ $booking->destination }}.</p>
+                            </div>
+                            <span class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">{{ ucfirst($booking->status) }}</span>
+                        </div>
+                        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-2xl bg-gray-50 p-4 dark:bg-zinc-950"><p class="text-xs uppercase tracking-wide text-gray-500">Pick-up</p><p class="mt-2 font-semibold text-gray-900 dark:text-white">{{ $booking->origin }}</p></div>
+                            <div class="rounded-2xl bg-gray-50 p-4 dark:bg-zinc-950"><p class="text-xs uppercase tracking-wide text-gray-500">Destination</p><p class="mt-2 font-semibold text-gray-900 dark:text-white">{{ $booking->destination }}</p></div>
+                            <div class="rounded-2xl bg-gray-50 p-4 dark:bg-zinc-950"><p class="text-xs uppercase tracking-wide text-gray-500">Route</p><p class="mt-2 font-semibold text-gray-900 dark:text-white">{{ number_format($booking->distance_km, 1) }} km / {{ $booking->duration_minutes }} min</p></div>
+                            <div class="rounded-2xl bg-gray-50 p-4 dark:bg-zinc-950"><p class="text-xs uppercase tracking-wide text-gray-500">Travel date</p><p class="mt-2 font-semibold text-gray-900 dark:text-white">{{ $booking->booking_date->format('d M Y') }}</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Billing Summary</h2>
+                    <div class="mt-4 flex justify-between border-t border-gray-200 pt-4 font-semibold text-gray-900 dark:border-zinc-800 dark:text-white"><span>Total</span><span>TZS {{ number_format($booking->total_price, 0) }}</span></div>
+                </div>
+            </div>
+            @else
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div class="xl:col-span-2 space-y-6">
                     <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm">
@@ -119,5 +144,6 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
 </x-layouts.app>

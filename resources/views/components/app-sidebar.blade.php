@@ -8,10 +8,10 @@ $user = $user ?? auth()->user();
     <flux:sidebar.header class="px-4 py-6 border-b border-zinc-200 dark:border-zinc-700">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                LN
+                LNT
             </div>
             <div class="flex-1">
-                <h2 class="font-bold text-gray-900 dark:text-white text-sm">LTN</h2>
+                <h2 class="font-bold text-gray-900 dark:text-white text-sm">LNT</h2>
                 <p class="text-xs text-gray-500 dark:text-gray-400">Live & Notify Tour</p>
             </div>
         </div>

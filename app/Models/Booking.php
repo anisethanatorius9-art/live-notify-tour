@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property int $id
  * @property int $tourist_id
- * @property int $service_id
+ * @property int|null $service_id
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $booking_date
  * @property string|null $booking_time
@@ -23,6 +23,16 @@ class Booking extends Model
     protected $fillable = [
         'tourist_id',
         'service_id',
+        'booking_type',
+        'transport_type',
+        'origin',
+        'destination',
+        'origin_latitude',
+        'origin_longitude',
+        'destination_latitude',
+        'destination_longitude',
+        'distance_km',
+        'duration_minutes',
         'status',
         'booking_date',
         'booking_time',
@@ -34,6 +44,11 @@ class Booking extends Model
     protected $casts = [
         'total_price' => 'decimal:2',
         'booking_date' => 'date',
+        'origin_latitude' => 'float',
+        'origin_longitude' => 'float',
+        'destination_latitude' => 'float',
+        'destination_longitude' => 'float',
+        'distance_km' => 'float',
     ];
 
     /**

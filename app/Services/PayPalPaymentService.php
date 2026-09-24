@@ -39,8 +39,8 @@ class PayPalPaymentService
                     ],
                 ]],
                 'application_context' => [
-                    'return_url' => route('payments.paypal.success', $payment),
-                    'cancel_url' => route('payments.paypal.cancel', $payment),
+                    'return_url' => route('payments.paypal.success', $payment->booking),
+                    'cancel_url' => route('payments.paypal.cancel', $payment->booking),
                     'user_action' => 'PAY_NOW',
                 ],
             ]);
