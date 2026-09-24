@@ -2,73 +2,92 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use RuntimeException;
 
 class TourismAiService
 {
     private const SYSTEM_PROMPT = <<<'PROMPT'
-You are the helpful support and tourism assistant for Live and Notify Tourism in Tanzania.
-Answer clearly and concisely. For platform questions, explain the relevant Live and Notify Tourism features without inventing policies, prices, booking status, or payment confirmation. For tourism questions, give practical Tanzania-focused suggestions and mention when details such as opening hours, availability, or prices should be verified. If you do not know something, say so and direct the user to Contact Support. Never claim to have completed an action or accessed private account data.
+You are "LNT Concierge," the official AI travel assistant and platform guide for Live & Notify Tourism (LNT).
+
+YOUR KNOWLEDGE & CAPABILITIES:
+1. PLATFORM NAVIGATION: Guide users on using LNT features (Dashboard, My Bookings, Locations, Tourism Map, Categories, Account Settings, Notifications).
+2. PAYMENTS & BOOKINGS: Explain how to complete bookings, handle failed payment transactions, and use supported payment options (Mobile Money: M-Pesa, Tigo Pesa, Airtel Money, as well as Card payments).
+3. LOCAL & WORLDWIDE TOURISM GUIDE: Act as an expert travel guide. Answer questions about Tanzanian attractions and global destinations, travel itineraries, passport and visa considerations, packing tips, and regional travel advice.
+
+TONE & BEHAVIOR:
+- Be warm, polite, conversational, and informative, like a professional travel concierge.
+- Use structured bullet points and bold headers to keep answers scannable.
+- Never invent account data, booking status, prices, policies, or payment confirmation. Recommend verifying current opening hours, availability, visa rules, and prices.
+- If an account-specific billing failure requires database intervention, direct the user to Contact Support through the Help Center.
 PROMPT;
 
-    /**
-     * @param  array<int, array{role: string, content: string}>  $history
-     */
-    public function ask(string $message, array $history = []): string
+    public function ask(Request $request)
     {
-        $apiKey = config('services.gemini.key');
+        $request->validate([
+            'prompt' => 'required|string|max:1000',
+        ]);
+        $answer = $this->generateResponse([
+            ['role' => 'user', 'content' => $request->input('prompt')],
+        ]);
 
-        if (! is_string($apiKey) || trim($apiKey) === '') {
-            throw new RuntimeException('The tourism assistant is not configured.');
+        if ($answer === 'ERROR_NOT_CONFIGURED') {
+            return response()->json(['error' => 'The tourism assistant is temporarily unavailable.'], 500);
         }
 
-        $contents = collect($history)
-            ->filter(fn (array $entry): bool => in_array($entry['role'] ?? null, ['user', 'model'], true))
-            ->map(fn (array $entry): array => [
-                'role' => $entry['role'],
-                'parts' => [['text' => $entry['content']]],
-            ])
-            ->push([
-                'role' => 'user',
-                'parts' => [['text' => $message]],
-            ])
-            ->values()
-            ->all();
+        return $answer;
+    }
+
+    /**
+     * @param  array<int, array{role: string, content: string}>  $messages
+     */
+    public function generateResponse(array $messages): string
+    {
+        $apiKey = config('services.gemini.key');
+        $model = config('services.gemini.model', 'gemini-2.5-flash');
+
+        if (! $apiKey) {
+            Log::error('Gemini API key is missing in config/services.php or .env');
+            return 'ERROR_NOT_CONFIGURED';
+        }
+
+        $endpoint = sprintf(
+            'https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s',
+            $model,
+            urlencode($apiKey)
+        );
 
         try {
-            $response = Http::timeout(30)
-                ->acceptJson()
-                ->post(sprintf(
-                    'https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s',
-                    config('services.gemini.model', 'gemini-2.0-flash'),
-                    urlencode($apiKey),
-                ), [
+            $response = Http::timeout(60)
+                ->connectTimeout(15)
+                ->post($endpoint, [
                     'system_instruction' => [
                         'parts' => [['text' => self::SYSTEM_PROMPT]],
                     ],
-                    'contents' => $contents,
-                    'generationConfig' => [
-                        'temperature' => 0.4,
-                        'maxOutputTokens' => 600,
+                    'contents' => [
+                        ...array_map(static fn(array $message): array => [
+                            'role' => $message['role'] === 'assistant' ? 'model' : 'user',
+                            'parts' => [['text' => $message['content']]],
+                        ], $messages),
                     ],
-                ])
-                ->throw();
+                    'generationConfig' => [
+                        'temperature' => 0.7,
+                        'maxOutputTokens' => 1000,
+                    ],
+                ]);
         } catch (\Throwable $exception) {
             Log::error('Tourism assistant request failed', [
                 'error' => $exception->getMessage(),
             ]);
 
-            throw new RuntimeException('The tourism assistant is temporarily unavailable.', 0, $exception);
+            return 'I am having trouble connecting to the travel service right now. Please try again shortly!';
         }
 
         $answer = $response->json('candidates.0.content.parts.0.text');
 
         if (! is_string($answer) || trim($answer) === '') {
-            Log::warning('Tourism assistant returned no answer', ['response' => $response->json()]);
-
-            throw new RuntimeException('The tourism assistant returned an empty response.');
+            return "I couldn't process that request. How else can I assist your travel plans?";
         }
 
         return trim($answer);

@@ -43,7 +43,22 @@ return [
 
      'gemini' => [
          'key' => env('GEMINI_API_KEY'),
-         'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+         'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+     ],
+
+     'selcom' => [
+         'base_url' => env('SELCOM_BASE_URL', 'https://apigw.selcommobile.com'),
+         'vendor' => env('SELCOM_VENDOR'),
+         'api_key' => env('SELCOM_API_KEY'),
+         'api_secret' => env('SELCOM_API_SECRET'),
+     ],
+
+     'paypal' => [
+         'base_url' => env('PAYPAL_BASE_URL', 'https://api-m.sandbox.paypal.com'),
+         'client_id' => env('PAYPAL_CLIENT_ID'),
+         'client_secret' => env('PAYPAL_CLIENT_SECRET'),
+         'currency' => env('PAYPAL_CURRENCY', 'USD'),
+         'tzs_to_usd_rate' => env('PAYPAL_TZS_TO_USD_RATE'),
      ],
 
      'twilio' => [

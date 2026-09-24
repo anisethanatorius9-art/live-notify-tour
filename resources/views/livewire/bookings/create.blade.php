@@ -102,6 +102,40 @@
                                 @enderror
                             </div>
 
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ __('Payment phone number') }} *
+                                </label>
+                                <input
+                                    wire:model="phone"
+                                    type="tel"
+                                    placeholder="255712345678"
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none" />
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Use the Tanzanian number linked to your mobile wallet.') }}</p>
+                                @error('phone')
+                                <span class="text-red-600 text-sm">{{ $message }}</span>
+                                @enderror
+                                @error('payment')
+                                <span class="text-red-600 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ __('Payment method') }} *
+                                </label>
+                                <select
+                                    wire:model="paymentMethod"
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+                                    <option value="mastercard">Mastercard / Visa</option>
+                                    <option value="paypal">PayPal</option>
+                                </select>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('You will be redirected to the secure payment page.') }}</p>
+                                @error('paymentMethod')
+                                <span class="text-red-600 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
                             <button
                                 type="submit"
                                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">

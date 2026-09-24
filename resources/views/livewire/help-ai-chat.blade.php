@@ -1,38 +1,43 @@
-<section class="mb-10 rounded-2xl border border-blue-100 bg-blue-50/60 p-5 sm:p-6" aria-labelledby="assistant-heading">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-            <p class="text-sm font-semibold uppercase tracking-wide text-blue-700">Tourism assistant</p>
-            <h2 id="assistant-heading" class="mt-1 text-xl font-bold text-zinc-900">Ask about the platform or Tanzania travel</h2>
-            <p class="mt-1 text-sm text-zinc-600">Get quick guidance while you plan your next experience.</p>
+<div class="my-6 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-4">
+        <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">AI</div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-800">LNT Travel Assistant</h3>
+                <p class="text-xs text-slate-500">Platform support and worldwide tourism guide</p>
+            </div>
         </div>
-        @if(count($chatHistory) > 0)
-            <button type="button" wire:click="clearChat" class="text-sm font-medium text-blue-700 hover:text-blue-900">Clear chat</button>
-        @endif
+        <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">Online</span>
     </div>
 
-    @if(count($chatHistory) > 0)
-        <div class="mt-5 max-h-96 space-y-3 overflow-y-auto rounded-xl bg-white p-4" aria-live="polite">
-            @foreach($chatHistory as $message)
-                <div wire:key="chat-message-{{ $loop->index }}" class="flex {{ $message['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
-                    <p class="max-w-3xl whitespace-pre-line rounded-xl px-4 py-3 text-sm {{ $message['role'] === 'user' ? 'bg-blue-600 text-white' : 'bg-zinc-100 text-zinc-800' }}">
-                        {{ $message['content'] }}
-                    </p>
-                </div>
-            @endforeach
+    @if(! $isConfigured)
+        <div class="border-b border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+            <strong>System Notice:</strong> The tourism assistant is missing an active API key. Please set <code>GEMINI_API_KEY</code> on Render.
         </div>
     @endif
 
-    @if($error)
-        <p class="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ $error }}</p>
-    @endif
+    <div class="h-96 space-y-4 overflow-y-auto bg-slate-50/50 p-6" id="chat-window" aria-live="polite">
+        @foreach($messages as $message)
+            @if($message['role'] === 'user')
+                <div wire:key="chat-message-{{ $loop->index }}" class="flex justify-end">
+                    <div class="max-w-[80%] rounded-2xl rounded-tr-none bg-blue-600 px-4 py-3 text-sm text-white shadow-sm">{{ $message['content'] }}</div>
+                </div>
+            @else
+                <div wire:key="chat-message-{{ $loop->index }}" class="flex justify-start gap-3">
+                    <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">AI</div>
+                    <div class="max-w-[85%] space-y-2 whitespace-pre-line rounded-2xl rounded-tl-none border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">{{ $message['content'] }}</div>
+                </div>
+            @endif
+        @endforeach
+        <div wire:loading.flex wire:target="sendMessage" class="justify-start gap-3">
+            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">AI</div>
+            <div class="rounded-2xl rounded-tl-none border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">Thinking...</div>
+        </div>
+    </div>
 
-    <form wire:submit="sendMessage" class="mt-5 flex flex-col gap-3 sm:flex-row">
-        <label for="ai-question" class="sr-only">Ask the tourism assistant</label>
-        <input id="ai-question" type="text" wire:model="userMessage" placeholder="e.g. How do I pay with M-Pesa?" maxlength="2000" class="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
-        <button type="submit" wire:loading.attr="disabled" class="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60">
-            <span wire:loading.remove>Ask assistant</span>
-            <span wire:loading>Thinking...</span>
-        </button>
+    <form wire:submit.prevent="sendMessage" class="flex gap-2 border-t border-slate-200 bg-white p-4">
+        <label for="ai-question" class="sr-only">Ask the LNT Travel Assistant</label>
+        <input id="ai-question" type="text" wire:model="userMessage" maxlength="2000" placeholder="Ask about payments, bookings, or destinations worldwide..." class="min-w-0 flex-1 rounded-xl border-0 bg-slate-100 px-4 py-3 text-sm transition focus:bg-white focus:ring-2 focus:ring-blue-500" @disabled(! $isConfigured)>
+        <button type="submit" wire:loading.attr="disabled" wire:target="sendMessage" class="rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-50" @disabled(! $isConfigured)>Send</button>
     </form>
-    @error('userMessage') <p class="mt-2 text-sm text-red-700">{{ $message }}</p> @enderror
-</section>
+</div>

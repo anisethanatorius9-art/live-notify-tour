@@ -19,8 +19,8 @@
                         LN
                     </div>
                     <div class="flex-1">
-                        <h2 class="font-bold text-gray-900 dark:text-white text-sm">LNT</h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Live & Notify</p>
+                        <h2 class="font-bold text-gray-900 dark:text-white text-sm">LTN</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Live & Notify Tour</p>
                     </div>
                 </div>
 

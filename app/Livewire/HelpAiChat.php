@@ -4,49 +4,50 @@ namespace App\Livewire;
 
 use App\Services\TourismAiService;
 use Livewire\Component;
-use Throwable;
-
 class HelpAiChat extends Component
 {
     public string $userMessage = '';
 
     /** @var array<int, array{role: string, content: string}> */
-    public array $chatHistory = [];
+    public array $messages = [];
 
-    public ?string $error = null;
+    public bool $isConfigured = true;
+    public bool $isLoading = false;
 
-    public function sendMessage(TourismAiService $tourismAiService): void
+    public function mount(): void
     {
-        $this->validate([
-            'userMessage' => ['required', 'string', 'max:2000'],
-        ]);
-
-        $message = trim($this->userMessage);
-
-        if ($message === '') {
-            $this->addError('userMessage', 'Please enter a question.');
-            return;
-        }
-
-        $this->error = null;
-
-        try {
-            $answer = $tourismAiService->ask($message, $this->chatHistory);
-        } catch (Throwable $exception) {
-            $this->error = $exception->getMessage();
-            return;
-        }
-
-        $this->chatHistory[] = ['role' => 'user', 'content' => $message];
-        $this->chatHistory[] = ['role' => 'model', 'content' => $answer];
-        $this->chatHistory = array_slice($this->chatHistory, -12);
-        $this->userMessage = '';
+        $this->isConfigured = (bool) config('services.gemini.key');
+        $this->messages[] = [
+            'role' => 'assistant',
+            'content' => "Hello! I'm your LNT Travel Concierge. Ask me anything about our platform, bookings, payment methods, or tourism recommendations worldwide!",
+        ];
     }
 
-    public function clearChat(): void
+    public function sendMessage(TourismAiService $aiService): void
     {
-        $this->chatHistory = [];
-        $this->error = null;
+        $message = trim($this->userMessage);
+
+        if ($message === '' || ! $this->isConfigured || $this->isLoading) {
+            return;
+        }
+
+        $this->validate(['userMessage' => ['string', 'max:2000']]);
+        $this->messages[] = ['role' => 'user', 'content' => $message];
+        $this->userMessage = '';
+        $this->isLoading = true;
+
+        try {
+            $response = $aiService->generateResponse($this->messages);
+        } finally {
+            $this->isLoading = false;
+        }
+
+        if ($response === 'ERROR_NOT_CONFIGURED') {
+            $this->isConfigured = false;
+            return;
+        }
+
+        $this->messages[] = ['role' => 'assistant', 'content' => $response];
     }
 
     public function render()

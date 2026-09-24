@@ -12,7 +12,7 @@ class HelpAiChatTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_assistant_appends_the_question_and_answer_to_chat_history(): void
+    public function test_assistant_appends_the_question_and_answer_to_messages(): void
     {
         config(['services.gemini.key' => 'test-key']);
         Http::fake([
@@ -25,12 +25,13 @@ class HelpAiChatTest extends TestCase
             ->set('userMessage', 'How do I pay with M-Pesa?')
             ->call('sendMessage')
             ->assertSet('userMessage', '')
-            ->assertSet('chatHistory.0.content', 'How do I pay with M-Pesa?')
-            ->assertSet('chatHistory.1.content', 'Use the M-Pesa option at checkout.')
+            ->assertSet('messages.0.role', 'assistant')
+            ->assertSet('messages.1.content', 'How do I pay with M-Pesa?')
+            ->assertSet('messages.2.content', 'Use the M-Pesa option at checkout.')
             ->assertHasNoErrors();
     }
 
-    public function test_assistant_reports_configuration_errors_without_losing_the_question(): void
+    public function test_assistant_disables_itself_when_the_api_key_is_missing(): void
     {
         config(['services.gemini.key' => null]);
 
@@ -38,7 +39,7 @@ class HelpAiChatTest extends TestCase
             ->set('userMessage', 'Recommend places to visit in Dar es Salaam')
             ->call('sendMessage')
             ->assertSet('userMessage', 'Recommend places to visit in Dar es Salaam')
-            ->assertSet('error', 'The tourism assistant is not configured.')
-            ->assertSet('chatHistory', []);
+            ->assertSet('isConfigured', false)
+            ->assertCount('messages', 1);
     }
 }

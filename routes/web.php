@@ -26,6 +26,18 @@ use App\Models\User;
 use App\Models\Location;
 use App\Models\Service;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\PaymentController;
+
+Route::post('/payments/selcom/webhook', [PaymentController::class, 'webhook'])
+    ->name('payments.selcom.webhook')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
+
+Route::middleware('auth')->group(function (): void {
+    Route::get('/payments/paypal/{booking}/success', [PaymentController::class, 'paypalSuccess'])
+        ->name('payments.paypal.success');
+    Route::get('/payments/paypal/{booking}/cancel', [PaymentController::class, 'paypalCancel'])
+        ->name('payments.paypal.cancel');
+});
 
 Route::get('/sitemap.xml', function () {
     return response()->file(public_path('sitemap.xml'), [
