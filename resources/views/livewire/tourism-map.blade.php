@@ -29,7 +29,7 @@
                             <flux:label>Destination</flux:label>
                             <flux:input id="directions-to" wire:model="destination" placeholder="Hotel, park, attraction or address" />
                         </flux:field>
-                        <flux:button id="get-directions-btn" variant="primary" class="w-full" icon="map">Find route and prices</flux:button>
+                        <flux:button type="button" id="get-directions-btn" variant="primary" class="w-full" icon="map">Find route and prices</flux:button>
                         <p id="route-error" class="hidden text-sm text-red-600 dark:text-red-400"></p>
                         <div id="eta-display" class="hidden rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/40">
                             <div class="flex items-center justify-between gap-3">
@@ -95,7 +95,7 @@
                                 <p class="text-xs uppercase tracking-wide text-zinc-500">Estimated total</p>
                                 <p class="text-2xl font-bold text-zinc-950 dark:text-white">TZS {{ number_format($estimatedFare, 0) }}</p>
                             </div>
-                            <flux:button wire:click="createTransportBooking" wire:loading.attr="disabled" variant="primary" icon="credit-card">
+                            <flux:button type="button" wire:click="createTransportBooking" wire:loading.attr="disabled" variant="primary" icon="credit-card">
                                 <span wire:loading.remove>Book and pay</span>
                                 <span wire:loading>Starting checkout...</span>
                             </flux:button>
@@ -131,10 +131,18 @@
             let userLocation;
             const locations = JSON.parse(document.getElementById('tourism-map-data').textContent);
 
-            const setLivewireRoute = (route) => {
+            const getLivewireComponent = () => {
                 const root = document.querySelector('[wire\\:id]');
-                const component = root ? Livewire.find(root.getAttribute('wire:id')) : null;
-                if (component) component.call('setRoute', route);
+                return root ? Livewire.find(root.getAttribute('wire:id')) : null;
+            };
+
+            const setLivewireRoute = (route) => {
+                const component = getLivewireComponent();
+                if (!component) return;
+
+                component.set('origin', route.origin);
+                component.set('destination', route.destination);
+                component.call('setRoute', route);
             };
 
             const locateUser = () => new Promise((resolve, reject) => {
@@ -165,7 +173,8 @@
                 error.classList.remove('hidden');
             };
 
-            const findRoute = async () => {
+            const findRoute = async (event) => {
+                event?.preventDefault();
                 const button = document.getElementById('get-directions-btn');
                 const from = document.getElementById('directions-from').value.trim();
                 const to = document.getElementById('directions-to').value.trim();
@@ -208,6 +217,7 @@
             };
 
             const init = () => {
+                if (map) return;
                 map = L.map('map').setView([-6.369028, 34.888822], 6);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
                 locations.forEach((location) => L.marker([location.lat, location.lng]).addTo(map).bindPopup(`<strong>${location.name}</strong><br>${location.description}`));
