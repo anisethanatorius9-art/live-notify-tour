@@ -52,8 +52,8 @@
                         </div>
                         <div class="space-y-3">
                             @foreach($transportOptions as $key => $option)
-                                <label class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition hover:border-blue-400 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 dark:has-[:checked]:border-blue-400 dark:has-[:checked]:bg-blue-950/30">
-                                    <input type="radio" wire:model.live="transportType" value="{{ $key }}" class="mt-1 text-blue-600 focus:ring-blue-500">
+                                <label wire:key="transport-option-{{ $key }}" class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition hover:border-blue-400 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 dark:has-[:checked]:border-blue-400 dark:has-[:checked]:bg-blue-950/30">
+                                    <input type="radio" name="transportType" wire:model.live="transportType" value="{{ $key }}" class="mt-1 text-blue-600 focus:ring-blue-500">
                                     <span class="min-w-0 flex-1">
                                         <span class="flex items-center justify-between gap-2">
                                             <span class="font-semibold text-zinc-900 dark:text-white">{{ $option['label'] }}</span>

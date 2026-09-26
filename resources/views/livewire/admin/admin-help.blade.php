@@ -39,7 +39,7 @@
                         <!-- Dashboard Help -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                📊 {{ __('Dashboard Overview') }}
+                                {{ __('Dashboard Overview') }}
                             </h3>
                             <p class="text-gray-600">
                                 {{ __('The Admin Dashboard shows real-time statistics about your platform including total users, services, bookings, and revenue. Use the metrics cards to monitor platform health at a glance.') }}
@@ -49,7 +49,7 @@
                         <!-- User Management -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                👥 {{ __('User Management') }}
+                                {{ __('User Management') }}
                             </h3>
                             <ul class="space-y-2 text-gray-600 list-disc list-inside">
                                 <li>{{ __('Search users by name or email') }}</li>
@@ -62,7 +62,7 @@
                         <!-- Services Management -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                🎯 {{ __('Services & Bookings') }}
+                                {{ __('Services & Bookings') }}
                             </h3>
                             <ul class="space-y-2 text-gray-600 list-disc list-inside">
                                 <li>{{ __('Monitor all active services on your platform') }}</li>
@@ -74,7 +74,7 @@
                         <!-- Locations & Categories -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                📍 {{ __('Locations & Categories') }}
+                                {{ __('Locations & Categories') }}
                             </h3>
                             <p class="text-gray-600">
                                 {{ __('Manage tour locations and service categories. Add new locations and categories to help providers create better services and help tourists find what they\'re looking for.') }}
@@ -84,7 +84,7 @@
                         <!-- Tips -->
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <h3 class="text-lg font-semibold text-blue-900 mb-2">
-                                💡 {{ __('Pro Tips') }}
+                                {{ __('Pro Tips') }}
                             </h3>
                             <ul class="space-y-2 text-blue-700 list-disc list-inside">
                                 <li>{{ __('Use search and filters to quickly find specific users or data') }}</li>

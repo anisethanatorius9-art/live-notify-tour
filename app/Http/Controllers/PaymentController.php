@@ -10,13 +10,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\SelcomPaymentService;
 use App\Services\PayPalPaymentService;
+use App\Mail\BookingReceiptEmail;
+use Illuminate\Support\Facades\Mail;
 use RuntimeException;
+use Throwable;
 
 class PaymentController extends Controller
 {
     public function paypalSuccess(Request $request, Booking $booking, PayPalPaymentService $paypal): mixed
     {
         abort_if($booking->tourist_id !== $request->user()->id, 403);
+        /** @var Payment $payment */
         $payment = $booking->payment()->where('status', 'pending')->firstOrFail();
 
         if ($request->filled('token') && $request->string('token')->toString() === $payment->gateway_transaction_id
@@ -25,6 +29,7 @@ class PaymentController extends Controller
                 $payment->update(['status' => 'completed', 'paid_at' => now()]);
                 $booking->update(['status' => 'confirmed']);
             });
+            $this->emailReceipt($payment->fresh());
 
             return redirect()->route('bookings.show', $booking)->with('success', 'PayPal payment completed.');
         }
@@ -46,6 +51,7 @@ class PaymentController extends Controller
         $data = $request->validate([
             'phone' => ['required', 'string', 'max:20'],
         ]);
+        /** @var Payment $payment */
         $payment = $booking->payment()->where('status', 'pending')->firstOrFail();
 
         try {
@@ -80,11 +86,12 @@ class PaymentController extends Controller
         $completed = in_array(strtoupper($data['payment_status']), ['COMPLETED', 'COMPLETE'], true)
             && ($data['resultcode'] ?? '000') === '000';
 
-        DB::transaction(function () use ($data, $completed): void {
+        $completedPaymentId = DB::transaction(function () use ($data, $completed): ?int {
+            /** @var Payment|null $payment */
             $payment = Payment::where('transaction_id', $data['order_id'])->lockForUpdate()->first();
 
             if (! $payment || ! $payment->isPending()) {
-                return;
+                return null;
             }
 
             $payment->update([
@@ -95,8 +102,33 @@ class PaymentController extends Controller
             if ($completed && $payment->booking?->status === 'pending') {
                 $payment->booking->update(['status' => 'confirmed']);
             }
+
+            return $completed ? $payment->id : null;
         });
 
+        if ($completedPaymentId !== null) {
+            $this->emailReceipt(Payment::findOrFail($completedPaymentId));
+        }
+
         return response()->json(['resultcode' => '000', 'result' => 'SUCCESS']);
+    }
+
+    private function emailReceipt(Payment $payment): void
+    {
+        $payment->loadMissing('booking.tourist', 'booking.service');
+        $email = $payment->booking?->tourist?->email;
+
+        if (! $email) {
+            return;
+        }
+
+        try {
+            Mail::to($email)->send(new BookingReceiptEmail($payment));
+        } catch (Throwable $exception) {
+            Log::error('Booking receipt email could not be sent.', [
+                'payment_id' => $payment->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
     }
 }

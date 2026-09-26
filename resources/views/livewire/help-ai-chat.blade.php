@@ -11,23 +11,23 @@
     </div>
 
     @if(! $isConfigured)
-        <div class="border-b border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
-            <strong>System Notice:</strong> The tourism assistant is missing an active API key. Please set <code>GEMINI_API_KEY</code> on Render.
-        </div>
+    <div class="border-b border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+        <strong>System Notice:</strong> The tourism assistant is missing an active API key. Please set <code>GEMINI_API_KEY</code> on Render.
+    </div>
     @endif
 
     <div class="h-96 space-y-4 overflow-y-auto bg-slate-50/50 p-6" id="chat-window" aria-live="polite">
         @foreach($messages as $message)
-            @if($message['role'] === 'user')
-                <div wire:key="chat-message-{{ $loop->index }}" class="flex justify-end">
-                    <div class="max-w-[80%] rounded-2xl rounded-tr-none bg-blue-600 px-4 py-3 text-sm text-white shadow-sm">{{ $message['content'] }}</div>
-                </div>
-            @else
-                <div wire:key="chat-message-{{ $loop->index }}" class="flex justify-start gap-3">
-                    <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">AI</div>
-                    <div class="max-w-[85%] space-y-2 whitespace-pre-line rounded-2xl rounded-tl-none border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">{{ $message['content'] }}</div>
-                </div>
-            @endif
+        @if($message['role'] === 'user')
+        <div wire:key="chat-message-{{ $loop->index }}" class="flex justify-end">
+            <div class="max-w-[80%] rounded-2xl rounded-tr-none bg-blue-600 px-4 py-3 text-sm text-white shadow-sm">{{ $message['content'] }}</div>
+        </div>
+        @else
+        <div wire:key="chat-message-{{ $loop->index }}" class="flex justify-start gap-3">
+            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">AI</div>
+            <div class="max-w-[85%] space-y-2 whitespace-pre-line rounded-2xl rounded-tl-none border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">{{ $message['content'] }}</div>
+        </div>
+        @endif
         @endforeach
         <div wire:loading.flex wire:target="sendMessage" class="justify-start gap-3">
             <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">AI</div>
