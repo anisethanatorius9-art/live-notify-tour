@@ -1,4 +1,4 @@
-<x-layouts.app>
+<div>
     <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <div class="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -228,4 +228,4 @@
             window.addEventListener('load', init, { once: true });
         })();
     </script>
-</x-layouts.app>
+</div>

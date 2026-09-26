@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Livewire\Component;
 use RuntimeException;
 
+#[\Livewire\Attributes\Layout('components.layouts.app')]
 class TourismMap extends Component
 {
     public string $origin = '';
