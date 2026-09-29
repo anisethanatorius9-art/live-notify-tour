@@ -22,9 +22,6 @@ $user = $user ?? auth()->user();
     <form action="{{ route('dashboard') }}" method="GET" class="m-4">
         <label for="sidebar-search" class="sr-only">{{ __('Search') }}</label>
         <div class="relative">
-            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
-                <flux:icon class="size-4" icon="magnifying-glass" variant="outline" />
-            </span>
             <flux:input
                 id="sidebar-search"
                 name="search"
