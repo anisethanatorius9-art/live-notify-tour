@@ -50,14 +50,18 @@
                             </div>
                             <flux:badge color="green">TZS</flux:badge>
                         </div>
-                        <flux:radio.group wire:model.live="transportType" variant="cards" class="space-y-3">
+                        <flux:radio.group wire:model.live="transportType" variant="cards" class="flex-col">
                             @foreach($transportOptions as $key => $option)
-                                <flux:radio wire:key="transport-option-{{ $key }}" value="{{ $key }}">
-                                    <span class="flex min-w-0 flex-1 items-start justify-between gap-3">
-                                        <span class="font-semibold text-zinc-900 dark:text-white">{{ $option['label'] }}</span>
+                                <flux:radio
+                                    wire:key="transport-option-{{ $key }}"
+                                    value="{{ $key }}"
+                                    label="{{ $option['label'] }}"
+                                    description="{{ $option['description'] }}"
+                                >
+                                    <span class="flex w-full min-w-0 items-center justify-between gap-3">
+                                        <span class="min-w-0 font-semibold text-zinc-900 dark:text-white">{{ $option['label'] }}</span>
                                         <span class="shrink-0 font-bold text-blue-700 dark:text-blue-300">{{ $option['quote'] ? 'TZS ' . number_format($option['quote'], 0) : 'Quote after route' }}</span>
                                     </span>
-                                    <span class="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">{{ $option['description'] }}</span>
                                 </flux:radio>
                             @endforeach
                         </flux:radio.group>
