@@ -17,7 +17,7 @@ new class extends Component {
      */
     public function mount(): void
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
 
         $this->name = $user->name;
         $this->email = $user->email;
@@ -36,7 +36,7 @@ new class extends Component {
      */
     public function updateProfileInformation(): void
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -79,7 +79,7 @@ new class extends Component {
      */
     public function resendVerificationNotification(): void
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
 
         if ($user->hasVerifiedEmail()) {
             $this->redirectIntended(default: route('dashboard', absolute: false));
@@ -90,6 +90,17 @@ new class extends Component {
         $user->sendEmailVerificationNotification();
 
         Session::flash('status', 'verification-link-sent');
+    }
+
+    private function authenticatedUser(): User
+    {
+        $user = Auth::user();
+
+        if (! $user instanceof User) {
+            abort(401);
+        }
+
+        return $user;
     }
 }; ?>
 
@@ -138,14 +149,16 @@ new class extends Component {
 
                     <div class="grid grid-cols-3 gap-3 mt-4">
                         @foreach ($avatarOptions as $avatar)
-                            <button
+                            <flux:button
                                 type="button"
                                 wire:click="selectAvatar('{{ $avatar }}')"
                                 wire:key="avatar-{{ $loop->index }}"
-                                class="rounded-xl border p-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 {{ $profilePhoto === $avatar ? 'border-blue-600 ring-2 ring-blue-200 dark:ring-blue-500' : 'border-gray-200 dark:border-zinc-700' }}"
+                                variant="outline"
+                                aria-label="{{ __('Select avatar') }}"
+                                class="h-auto w-full justify-center rounded-xl p-2 {{ $profilePhoto === $avatar ? 'border-blue-600 ring-2 ring-blue-200 dark:ring-blue-500' : 'border-gray-200 dark:border-zinc-700' }}"
                             >
                                 <img src="{{ $avatar }}" alt="{{ __('Avatar option') }}" class="h-20 w-full rounded-xl object-cover" />
-                            </button>
+                            </flux:button>
                         @endforeach
                     </div>
 

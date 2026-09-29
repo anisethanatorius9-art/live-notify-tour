@@ -28,29 +28,26 @@
                 <!-- Search and Filters -->
                 <div class="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mb-6 md:mb-8">
                     <div class="space-y-3 md:space-y-4">
-                        <input
+                        <flux:input
                             wire:model.live="search"
                             type="search"
+                            aria-label="{{ __('Search services and locations') }}"
                             placeholder="{{ __('Search services, locations...') }}"
-                            class="w-full px-4 py-2 md:py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:border-blue-400 dark:focus:ring-blue-900 outline-none transition text-sm md:text-base" />
+                        />
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                            <select
-                                wire:model.live="selectedLocation"
-                                class="w-full px-4 py-2 md:py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 appearance-none text-sm md:text-base">
-                                <option value="">{{ __('All Locations') }}</option>
+                            <flux:select wire:model.live="selectedLocation" aria-label="{{ __('Filter by location') }}">
+                                <flux:select.option value="">{{ __('All Locations') }}</flux:select.option>
                                 @foreach($locations as $id => $name)
-                                <option value="{{ $id }}">{{ $name }}</option>
+                                    <flux:select.option value="{{ $id }}">{{ $name }}</flux:select.option>
                                 @endforeach
-                            </select>
-                            <select
-                                wire:model.live="filterCategory"
-                                class="w-full px-4 py-2 md:py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 appearance-none text-sm md:text-base">
-                                <option value="">{{ __('All Categories') }}</option>
+                            </flux:select>
+                            <flux:select wire:model.live="filterCategory" aria-label="{{ __('Filter by category') }}">
+                                <flux:select.option value="">{{ __('All Categories') }}</flux:select.option>
                                 @foreach($categories as $key => $value)
-                                <option value="{{ $key }}">{{ $value }}</option>
+                                    <flux:select.option value="{{ $key }}">{{ $value }}</flux:select.option>
                                 @endforeach
-                            </select>
+                            </flux:select>
                         </div>
                     </div>
                 </div>

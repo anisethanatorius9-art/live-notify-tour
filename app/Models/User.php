@@ -24,6 +24,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property \Illuminate\Support\Carbon|null $role_selected_at
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
+ * @property \Illuminate\Support\Carbon|null $two_factor_confirmed_at
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
@@ -69,7 +70,7 @@ class User extends Authenticatable
     /**
      * Normalize email addresses to lowercase before persisting them.
      */
-    public function setEmailAttribute($value): void
+    public function setEmailAttribute(mixed $value): void
     {
         $this->attributes['email'] = Str::lower(trim((string) $value));
     }

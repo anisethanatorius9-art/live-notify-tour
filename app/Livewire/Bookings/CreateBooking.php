@@ -15,7 +15,7 @@ use RuntimeException;
 class CreateBooking extends Component
 {
     public ?Service $service = null;
-    public $bookingDate;
+    public ?string $bookingDate = null;
     public $numberOfPeople = 1;
     public $totalPrice = 0;
     public $notes = '';

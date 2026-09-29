@@ -5,9 +5,12 @@ use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 new class extends Component {
@@ -37,11 +40,13 @@ new class extends Component {
     {
         abort_unless(Features::enabled(Features::twoFactorAuthentication()), Response::HTTP_FORBIDDEN);
 
-        if (Fortify::confirmsTwoFactorAuthentication() && is_null(auth()->user()->two_factor_confirmed_at)) {
-            $disableTwoFactorAuthentication(auth()->user());
+        $user = $this->authenticatedUser();
+
+        if (Fortify::confirmsTwoFactorAuthentication() && is_null($user->two_factor_confirmed_at)) {
+            $disableTwoFactorAuthentication->__invoke($user);
         }
 
-        $this->twoFactorEnabled = auth()->user()->hasEnabledTwoFactorAuthentication();
+        $this->twoFactorEnabled = $user->hasEnabledTwoFactorAuthentication();
         $this->requiresConfirmation = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm');
     }
 
@@ -50,10 +55,10 @@ new class extends Component {
      */
     public function enable(EnableTwoFactorAuthentication $enableTwoFactorAuthentication): void
     {
-        $enableTwoFactorAuthentication(auth()->user());
+        $enableTwoFactorAuthentication->__invoke($this->authenticatedUser());
 
         if (! $this->requiresConfirmation) {
-            $this->twoFactorEnabled = auth()->user()->hasEnabledTwoFactorAuthentication();
+            $this->twoFactorEnabled = $this->authenticatedUser()->hasEnabledTwoFactorAuthentication();
         }
 
         $this->loadSetupData();
@@ -66,7 +71,7 @@ new class extends Component {
      */
     private function loadSetupData(): void
     {
-        $user = auth()->user();
+        $user = $this->authenticatedUser();
 
         try {
             $this->qrCodeSvg = $user?->twoFactorQrCodeSvg();
@@ -101,7 +106,7 @@ new class extends Component {
     {
         $this->validate();
 
-        $confirmTwoFactorAuthentication(auth()->user(), $this->code);
+        $confirmTwoFactorAuthentication->__invoke($this->authenticatedUser(), $this->code);
 
         $this->closeModal();
 
@@ -123,7 +128,7 @@ new class extends Component {
      */
     public function disable(DisableTwoFactorAuthentication $disableTwoFactorAuthentication): void
     {
-        $disableTwoFactorAuthentication(auth()->user());
+        $disableTwoFactorAuthentication->__invoke($this->authenticatedUser());
 
         $this->twoFactorEnabled = false;
     }
@@ -144,8 +149,19 @@ new class extends Component {
         $this->resetErrorBag();
 
         if (! $this->requiresConfirmation) {
-            $this->twoFactorEnabled = auth()->user()->hasEnabledTwoFactorAuthentication();
+            $this->twoFactorEnabled = $this->authenticatedUser()->hasEnabledTwoFactorAuthentication();
         }
+    }
+
+    private function authenticatedUser(): User
+    {
+        $user = Auth::user();
+
+        if (! $user instanceof User) {
+            throw new AuthenticationException();
+        }
+
+        return $user;
     }
 
     /**
@@ -351,22 +367,25 @@ new class extends Component {
                             }
                         }"
                     >
-                        <div class="flex items-stretch w-full border rounded-xl dark:border-stone-700">
+                        <div class="flex w-full items-center gap-2">
                             @empty($manualSetupKey)
                                 <div class="flex items-center justify-center w-full p-3 bg-stone-100 dark:bg-stone-700">
                                     <flux:icon.loading variant="mini"/>
                                 </div>
                             @else
-                                <input
+                                <flux:input
                                     type="text"
                                     readonly
                                     value="{{ $manualSetupKey }}"
-                                    class="w-full p-3 bg-transparent outline-none text-stone-900 dark:text-stone-100"
+                                    aria-label="{{ __('Manual setup key') }}"
+                                    class="flex-1"
                                 />
 
-                                <button
+                                <flux:button
+                                    type="button"
+                                    variant="outline"
                                     @click="copy()"
-                                    class="px-3 transition-colors border-l cursor-pointer border-stone-200 dark:border-stone-600"
+                                    aria-label="{{ __('Copy setup key') }}"
                                 >
                                     <flux:icon.document-duplicate x-show="!copied" variant="outline"></flux:icon>
                                     <flux:icon.check
@@ -374,7 +393,7 @@ new class extends Component {
                                         variant="solid"
                                         class="text-green-500"
                                     ></flux:icon>
-                                </button>
+                                </flux:button>
                             @endempty
                         </div>
                     </div>

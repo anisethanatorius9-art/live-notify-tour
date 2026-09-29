@@ -78,7 +78,7 @@
                             </div>
 
                             <div class="flex flex-col gap-2">
-                                <input type="file" wire:model="image" accept="image/*" class="text-sm" />
+                                <flux:input type="file" wire:model="image" accept="image/*" />
                                 @if($errors->first('image'))
                                 <div class="text-sm text-red-600">{{ $errors->first('image') }}</div>
                                 @endif

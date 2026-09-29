@@ -50,20 +50,17 @@
                             </div>
                             <flux:badge color="green">TZS</flux:badge>
                         </div>
-                        <div class="space-y-3">
+                        <flux:radio.group wire:model.live="transportType" variant="cards" class="space-y-3">
                             @foreach($transportOptions as $key => $option)
-                                <label wire:key="transport-option-{{ $key }}" class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition hover:border-blue-400 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 dark:has-[:checked]:border-blue-400 dark:has-[:checked]:bg-blue-950/30">
-                                    <input type="radio" name="transportType" wire:model.live="transportType" value="{{ $key }}" class="mt-1 text-blue-600 focus:ring-blue-500">
-                                    <span class="min-w-0 flex-1">
-                                        <span class="flex items-center justify-between gap-2">
-                                            <span class="font-semibold text-zinc-900 dark:text-white">{{ $option['label'] }}</span>
-                                            <span class="font-bold text-blue-700 dark:text-blue-300">{{ $option['quote'] ? 'TZS ' . number_format($option['quote'], 0) : 'Quote after route' }}</span>
-                                        </span>
-                                        <span class="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">{{ $option['description'] }}</span>
+                                <flux:radio wire:key="transport-option-{{ $key }}" value="{{ $key }}">
+                                    <span class="flex min-w-0 flex-1 items-start justify-between gap-3">
+                                        <span class="font-semibold text-zinc-900 dark:text-white">{{ $option['label'] }}</span>
+                                        <span class="shrink-0 font-bold text-blue-700 dark:text-blue-300">{{ $option['quote'] ? 'TZS ' . number_format($option['quote'], 0) : 'Quote after route' }}</span>
                                     </span>
-                                </label>
+                                    <span class="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">{{ $option['description'] }}</span>
+                                </flux:radio>
                             @endforeach
-                        </div>
+                        </flux:radio.group>
                     </flux:card>
 
                     <flux:card class="space-y-4">

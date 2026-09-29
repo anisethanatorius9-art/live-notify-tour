@@ -33,16 +33,17 @@
                     <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
                         <flux:icon class="size-4" icon="magnifying-glass" variant="outline" />
                     </span>
-                    <input
+                    <flux:input
                         id="sidebar-search"
                         name="search"
                         type="search"
                         value="{{ request('search') }}"
                         placeholder="{{ __('Search parks, services...') }}"
-                        class="h-10 w-full rounded-lg border border-zinc-200 bg-white px-10 pr-12 text-sm text-zinc-700 placeholder:text-zinc-400 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
-                    <button type="submit" class="absolute inset-y-0 end-0 flex items-center justify-center px-3 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white">
+                        aria-label="{{ __('Search parks and services') }}"
+                        class="h-10 w-full" />
+                    <flux:button type="submit" variant="ghost" aria-label="{{ __('Search') }}" class="absolute inset-y-0 end-0 flex items-center justify-center px-3 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white">
                         <flux:icon class="size-4" icon="magnifying-glass" variant="outline" />
-                    </button>
+                    </flux:button>
                 </div>
             </form>
 

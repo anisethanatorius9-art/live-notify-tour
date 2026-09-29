@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LTN - Live & Notify Tourism</title>
+    <title>LNT - Live & Notify Tourism</title>
 
     <meta name="google-site-verification" content="6oNiMI3leZqDcDNncGB-wJ8K5wQ62vr94OBrrnUYpFQ" />
 
@@ -205,8 +205,8 @@
 
         <nav class="relative z-50 px-10 py-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="/logo.svg" alt="LTN" class="w-10 h-10">
-                <span class="text-xl font-bold tracking-widest">LTN</span>
+                <img src="/logo.svg" alt="LNT" class="w-10 h-10">
+                <span class="text-xl font-bold tracking-widest">LNT</span>
             </div>
             <div class="hidden md:flex gap-8">
                 <a href="https://live-notify-tour.onrender.com/login" class="hover:text-blue-400 transition">Sign In</a>

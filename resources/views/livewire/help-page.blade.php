@@ -14,13 +14,14 @@
                     <circle cx="11" cy="11" r="8" />
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
-                <input
+                <flux:input
                     id="help-search"
                     type="text"
                     wire:model.debounce.300ms="search"
                     placeholder="How can we help you?"
-                    class="w-full pl-12 pr-4 py-4 rounded-2xl border border-zinc-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                >
+                    aria-label="How can we help you?"
+                    class="w-full"
+                />
             </div>
         </div>
 
@@ -28,10 +29,11 @@
 
         <div class="grid md:grid-cols-3 gap-6 mb-10">
             @foreach($categories as $category)
-                <button
+                <flux:button
                     type="button"
                     wire:click="selectCategory('{{ $category['name'] }}')"
-                    class="flex flex-col gap-3 p-6 rounded-2xl shadow {{ $selectedCategory === $category['name'] ? 'border border-blue-500 shadow-lg' : 'bg-white' }} hover:shadow-lg transition"
+                    variant="outline"
+                    class="flex h-auto w-full flex-col items-start gap-3 rounded-2xl p-6 text-left shadow {{ $selectedCategory === $category['name'] ? 'border-blue-500 shadow-lg' : 'bg-white' }} hover:shadow-lg"
                 >
                     <span class="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-blue-50 text-blue-600">
                         @if($category['icon'] === 'user')
@@ -63,7 +65,7 @@
                         <h3 class="text-lg font-semibold">{{ $category['name'] }}</h3>
                         <p class="text-gray-500 text-sm">{{ $category['description'] }}</p>
                     </div>
-                </button>
+                </flux:button>
             @endforeach
         </div>
 
@@ -76,9 +78,9 @@
             <div x-data="{ open: null }" class="space-y-3">
                 @forelse($filteredFaqs as $index => $faq)
                     <div class="border rounded-xl p-4">
-                        <button @click="open === {{ $index }} ? open = null : open = {{ $index }}" class="w-full text-left font-medium">
+                        <flux:button type="button" variant="ghost" @click="open === {{ $index }} ? open = null : open = {{ $index }}" class="w-full justify-start text-left font-medium">
                             {{ $faq['question'] }}
-                        </button>
+                        </flux:button>
                         <p x-show="open === {{ $index }}" x-cloak class="mt-2 text-gray-500">
                             {{ $faq['answer'] }}
                         </p>
@@ -96,8 +98,8 @@
             <p class="text-gray-600 mb-4">Contact our support team for additional assistance.</p>
 
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button class="px-4 py-2 bg-blue-600 text-white rounded-xl">Contact Support</button>
-                <button class="px-4 py-2 border border-zinc-300 rounded-xl">Report an Issue</button>
+                <flux:button type="button" variant="primary">Contact Support</flux:button>
+                <flux:button type="button" variant="outline">Report an Issue</flux:button>
             </div>
         </div>
     </div>

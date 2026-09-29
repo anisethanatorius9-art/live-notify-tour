@@ -9,21 +9,19 @@
 
         <flux:card class="p-4 sm:p-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <input
-                    type="text"
+                <flux:input
+                    type="search"
                     wire:model.debounce.500ms="search"
                     placeholder="{{ __('Search payments, users, or services...') }}"
-                    class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    aria-label="{{ __('Search payments, users, or services') }}"
+                    class="flex-1"
                 />
-                <select
-                    wire:model="filterStatus"
-                    class="rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                >
-                    <option value="">{{ __('All status') }}</option>
-                    <option value="pending">{{ __('Pending') }}</option>
-                    <option value="completed">{{ __('Completed') }}</option>
-                    <option value="failed">{{ __('Failed') }}</option>
-                </select>
+                <flux:select wire:model="filterStatus" aria-label="{{ __('Filter by payment status') }}">
+                    <flux:select.option value="">{{ __('All status') }}</flux:select.option>
+                    <flux:select.option value="pending">{{ __('Pending') }}</flux:select.option>
+                    <flux:select.option value="completed">{{ __('Completed') }}</flux:select.option>
+                    <flux:select.option value="failed">{{ __('Failed') }}</flux:select.option>
+                </flux:select>
             </div>
         </flux:card>
 
@@ -108,12 +106,12 @@
 
                                 @if($payment->status === 'pending')
                                     <div class="flex flex-col gap-2 sm:flex-row">
-                                        <button wire:click="approvePayment({{ $payment->id }})" class="flex-1 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white transition hover:bg-green-700">
+                                        <flux:button wire:click="approvePayment({{ $payment->id }})" variant="primary" class="flex-1">
                                             ✓ {{ __('Accept') }}
-                                        </button>
-                                        <button wire:click="rejectPayment({{ $payment->id }})" class="flex-1 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700">
+                                        </flux:button>
+                                        <flux:button wire:click="rejectPayment({{ $payment->id }})" variant="danger" class="flex-1">
                                             ✗ {{ __('Reject') }}
-                                        </button>
+                                        </flux:button>
                                     </div>
                                 @else
                                     <div class="rounded-lg bg-gray-100 p-3 text-center dark:bg-zinc-800">

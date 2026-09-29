@@ -30,16 +30,16 @@
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-zinc-300">Search</label>
-                    <input type="text" wire:model.live="search" placeholder="Search by name or email..." class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    <flux:input type="search" wire:model.live="search" placeholder="Search by name or email..." aria-label="Search by name or email" />
                 </div>
                 <div>
                     <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-zinc-300">Filter by Role</label>
-                    <select wire:model.live="filterRole" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
-                        <option value="">All Roles</option>
-                        <option value="tourist">Tourist</option>
-                        <option value="provider">Service Provider</option>
-                        <option value="admin">Admin</option>
-                    </select>
+                    <flux:select wire:model.live="filterRole" aria-label="Filter by role">
+                        <flux:select.option value="">All Roles</flux:select.option>
+                        <flux:select.option value="tourist">Tourist</flux:select.option>
+                        <flux:select.option value="provider">Service Provider</flux:select.option>
+                        <flux:select.option value="admin">Admin</flux:select.option>
+                    </flux:select>
                 </div>
             </div>
         </div>
@@ -85,30 +85,25 @@
                                     <div class="text-sm text-gray-600 dark:text-zinc-400">{{ $user->email }}</div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium
-                                        @if($user->role === 'tourist') bg-blue-100 text-blue-800
-                                        @elseif($user->role === 'provider') bg-green-100 text-green-800
-                                        @elseif($user->role === 'admin') bg-red-100 text-red-800
-                                        @endif
-                                    ">
+                                    <flux:badge :color="$user->role === 'tourist' ? 'blue' : ($user->role === 'provider' ? 'green' : 'red')">
                                         {{ ucfirst($user->role) }}
-                                    </span>
+                                    </flux:badge>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <select wire:change="updateUserRole({{ $user->id }}, $event.target.value)" class="rounded-lg border border-gray-300 px-3 py-1 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
-                                        <option value="tourist" @if($user->role === 'tourist') selected @endif>Tourist</option>
-                                        <option value="provider" @if($user->role === 'provider') selected @endif>Provider</option>
-                                        <option value="admin" @if($user->role === 'admin') selected @endif>Admin</option>
-                                    </select>
+                                    <flux:select wire:change="updateUserRole({{ $user->id }}, $event.target.value)" aria-label="Change role for {{ $user->name }}">
+                                        <flux:select.option value="tourist" :selected="$user->role === 'tourist'">Tourist</flux:select.option>
+                                        <flux:select.option value="provider" :selected="$user->role === 'provider'">Provider</flux:select.option>
+                                        <flux:select.option value="admin" :selected="$user->role === 'admin'">Admin</flux:select.option>
+                                    </flux:select>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600 dark:text-zinc-400">
                                     {{ $user->created_at->format('M d, Y') }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 text-sm">
                                     @if($user->id !== auth()->id())
-                                        <button type="button" wire:click="deleteUser({{ $user->id }})" wire:confirm="Are you sure you want to delete this user?" class="font-medium text-red-600 hover:text-red-900">
+                                        <flux:button type="button" wire:click="deleteUser({{ $user->id }})" wire:confirm="Are you sure you want to delete this user?" variant="danger" size="sm">
                                             Delete
-                                        </button>
+                                        </flux:button>
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif
